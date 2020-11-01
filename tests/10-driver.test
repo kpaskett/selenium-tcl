@@ -1,0 +1,303 @@
+#
+# some tests are stolen from https://github.com/tobijk/caius
+#
+
+package require tcltest
+namespace import ::tcltest::*
+
+lappend auto_path [file join [pwd] ..]
+package require selenium
+
+# works fine
+#testConstraint chromeDriver [expr {![catch {exec chromedriver --version}]}]
+
+# works, except clear_text
+#testConstraint geckoDriver [expr {![catch {exec geckodriver --version}]}]
+
+# opera message: unsupported command-line --enable-blink-features
+#testConstraint operaDriver [expr {![catch {exec operadriver --version}]}]
+
+# works fine, no alerts
+#testConstraint phantomjsDriver [expr {![catch {exec phantomjs --version}]}]
+
+set java [expr {[info exists env(JAVA_HOME)] ? [file join $env(JAVA_HOME) bin java] : "java"}]
+set selenium [expr {[info exists env(SELENIUM)] ? $env(SELENIUM) : "/usr/local/lib/selenium"}]
+set seleniumport ""
+set seleniumpid ""
+
+# works fine
+#set htmlunitlauncher "-cp $selenium/htmlunit-driver-2.44.0-jar-with-dependencies.jar:$selenium/selenium-server-standalone-3.141.59.jar org.openqa.grid.selenium.GridLauncherV3"
+#testConstraint htmlunitDriver [expr {![catch {exec $java {*}$htmlunitlauncher --version}]}]
+
+# works fine
+#set seleniumlauncher "-jar $selenium/selenium-server-standalone-3.141.59.jar"
+#testConstraint seleniumDriver [expr {![catch {exec $java {*}$seleniumlauncher --version}]}]
+
+# works fine
+#set selenium4launcher "-jar $selenium/selenium-server-4.0.0-alpha-6.jar standalone"
+#testConstraint selenium4Driver [expr {![catch {exec $java {*}$selenium4launcher --version}]}]
+
+#testConstraint seleniumBrowsers 1
+
+proc page html {return file://[file join [testsDirectory] html $html]}
+
+test webdriver-init-0.1-chrome "Load chrome driver" {!webConnected && chromeDriver} {
+    package require selenium::chrome
+ #  set driver [::selenium::ChromeDriver new]
+    set driver [::selenium::ChromeDriver new -browser_args {-headless -test-type}]
+    testConstraint webConnected 1
+} {1}
+
+test webdriver-init-0.2-gecko "Load gecko driver" {!webConnected && geckoDriver} {
+    package require selenium::firefox
+    set driver [::selenium::FirefoxDriver new -use_geckodriver 1]
+#   testConstraint handlesAlerts 1
+    testConstraint cssSelectorsEnabled 1
+    testConstraint webConnected 1
+} {1}
+
+test webdriver-init-0.3-opera "Load opera driver" {!webConnected && operaDriver} {
+    package require selenium::opera
+    set driver [::selenium::OperaDriver new]
+    testConstraint webConnected 1
+} {1}
+
+test webdriver-init-0.4-phantomjs "Load phantomjs driver" {!webConnected && phantomjsDriver} {
+    package require selenium::phantomjs
+    set driver [::selenium::PhantomJSdriver new]
+    testConstraint webConnected 1
+} {1}
+
+test webdriver-init-0.5-htmlunit "Load htmlunit driver" {!webConnected && htmlunitDriver} {
+    package require selenium::utils::port
+    set seleniumport [::selenium::utils::port::get_free_port]
+#   puts [list exec $java {*}$htmlunitlauncher -port $port &]
+    set seleniumpid [exec $java {*}$htmlunitlauncher -port $seleniumport &]
+    if {![::selenium::utils::port::wait_until_connectable $seleniumport]} {
+        error "Can not connect to the Selenium"
+    }
+    set driver [::selenium::WebDriver new http://127.0.0.1:$seleniumport/wd/hub $::selenium::DesiredCapabilities(HTMLUNITWITHJS)]
+    unset port
+    testConstraint seleniumStarted 1
+    testConstraint webConnected 1
+} {1}
+
+test webdriver-init-0.6.0-selenium3 "Start selenium" {!webConnected && seleniumDriver} {
+    package require selenium::utils::port
+    set seleniumport [::selenium::utils::port::get_free_port]
+#   puts [list exec $java {*}$seleniumlauncher -port $seleniumport &]
+    set seleniumpid [exec $java {*}$seleniumlauncher -port $seleniumport &]
+    if {![::selenium::utils::port::wait_until_connectable $seleniumport]} {
+        error "Can not connect to the Selenium"
+    }
+    testConstraint seleniumStarted 1
+} {1}
+
+test webdriver-init-0.6.1-selenium4 "Start selenium" {!webConnected && selenium4Driver} {
+    package require selenium::utils::port
+    set seleniumport [::selenium::utils::port::get_free_port]
+#   puts [list exec $java {*}$seleniumlauncher --port $seleniumport &]
+    set seleniumpid [exec $java {*}$selenium4launcher --port $seleniumport &]
+    if {![::selenium::utils::port::wait_until_connectable $seleniumport]} {
+        error "Can not connect to the Selenium"
+    }
+    testConstraint seleniumStarted 1
+} {1}
+
+set seleniumbrowsers {}
+test webdriver-init-0.6.1-selenium "Check selenium browsers" {!webConnected && seleniumStarted && seleniumBrowsers} {
+    set seleniumbrowsers {}
+    foreach browser [lsort [array names ::selenium::DesiredCapabilities]] {
+        if {[catch {::selenium::WebDriver new http://127.0.0.1:$seleniumport/wd/hub $::selenium::DesiredCapabilities($browser)} result]} {
+#           puts "$browser: $result"
+            puts [list $browser: [regexp -inline {browser message: [^\n]*} $result]]
+        } else {
+            puts [list $browser: [$result name] [$result current_capabilities]]
+            lappend seleniumbrowsers $browser
+            $result quit
+            $result destroy
+        }
+    }
+    unset -nocomplain result browser
+    set seleniumbrowsers
+} [lsort [array names ::selenium::DesiredCapabilities]]
+unset seleniumbrowsers
+
+test webdriver-init-0.6.2-selenium "Load selenium driver" {!webConnected && seleniumStarted} {
+    set caps {browserName firefox}
+#   set caps {browserName chrome}
+#   set caps {browserName operablink}
+    set driver [::selenium::WebDriver new http://127.0.0.1:$seleniumport/wd/hub $caps]
+    unset caps
+    testConstraint handlesAlerts 1
+    testConstraint cssSelectorsEnabled 1
+    testConstraint javascriptEnabled 1
+    testConstraint webConnected 1
+} {1}
+
+test webdriver-caps-1.0 "Test current capabilities" webConnected {
+    set caps [$driver current_capabilities]
+#   puts [list webdriver-caps $caps]
+    foreach c {handlesAlerts cssSelectorsEnabled javascriptEnabled} {
+        catch {testConstraint $c [dict get $caps $c]}
+        puts "Test constraint:  $c is [testConstraint $c]"
+    }
+    unset c caps
+} {}
+
+test webdriver-element-1.0 "Label text" -setup {
+    $driver get [page page_text.html]
+} -constraints {webConnected} -body {
+    $driver find_element_by_id "label" -command_var element
+    $element get_text
+} -cleanup {
+    $element destroy
+    $driver get "about:blank"
+    unset element
+} -result {Label Text}
+
+test webdriver-element-2.0 "Input value" -setup {
+    $driver get [page page_text.html]
+} -constraints {webConnected} -body {
+    $driver find_element_by_id "input" -command_var element
+    list \
+            [$element get_attribute value] \
+            [$element tag_name] \
+            [$element is_enabled]
+} -cleanup {
+    $element destroy
+    $driver get "about:blank"
+} -result {{Input Field} input true}
+
+test webdriver-element-2.1 "Input clear" -setup {
+    $driver get [page page_text.html]
+} -constraints {webConnected} -body {
+    $driver find_element_by_id "input" -command_var element
+    $element clear_text
+    $element get_attribute value
+} -cleanup {
+    $element destroy
+    $driver get "about:blank"
+} -result {}
+
+test webdriver-element-2.2 {Input with iso text} -setup {
+    $driver get [page page_text.html]
+} -constraints {webConnected} -body {
+    $driver find_element_by_id "input" -command_var element
+    $element clear_text
+    $element send_keys "Hello World! ÄÖÜß"
+    $element get_attribute value
+} -cleanup {
+    $element destroy
+    $driver get "about:blank"
+} -result {Hello World! ÄÖÜß}
+
+test webdriver-element-2.3 {Multiple elements} -setup {
+    $driver get [page page_text.html]
+} -constraints {webConnected} -body {
+    llength [$driver find_elements_by_tag_name "li"]
+} -cleanup {
+    $driver get "about:blank"
+} -result {3}
+
+test webdriver-element-3.0 "Checkbox select" -setup {
+    $driver get [page page_select.html]
+} -constraints {webConnected} -body {
+    $driver find_element_by_id "id_enable" -command_var element
+    list \
+            [$element is_selected] \
+            [$element click] \
+            [$element is_selected]
+} -cleanup {
+    $element destroy
+    $driver get "about:blank"
+} -result {false {*value {}*} true} -match glob
+
+test webdriver-element-3.1 "Combobox select" -setup {
+    $driver get [page page_select.html]
+} -constraints {webConnected} -body {
+    $driver find_element_by_id "id_select" -command_var element
+    $element find_element -xpath {//option[2]} -command_var option
+    list \
+            [$option is_selected] \
+            [$option click] \
+            [$option is_selected]
+} -cleanup {
+    $option destroy
+    $element destroy
+    $driver get "about:blank"
+} -result {false {*value {}*} true} -match glob
+
+test webdriver-element-4.0 {Inject script synchronously} -setup {
+    $driver get [page page1.html]
+} -constraints {webConnected javascriptEnabled} -body {
+    set script {
+        return Math.sqrt(arguments[0]);
+    }
+    $driver execute_javascript $script -argument number 144
+} -cleanup {
+    $driver get "about:blank"
+} -result {12}
+
+test webdriver-element-4.1 {Inject script asynchronously} -setup {
+    $driver get [page page1.html]
+} -constraints {webConnected javascriptEnabled} -body {
+    set script {
+        var callback = arguments[arguments.length - 1]
+        var result = Math.sqrt(arguments[0]);
+        callback(result);
+    }
+    $driver execute_javascript $script -async -argument number 169
+} -cleanup {
+    $driver get "about:blank"
+} -result {13}
+
+test webdriver-element-4.2 {Error in script} -setup {
+    $driver get [page page1.html]
+} -constraints {webConnected javascriptEnabled} -body {
+    set script {
+        return no_var;
+    }
+    $driver execute_javascript $script
+} -cleanup {
+    $driver get "about:blank"
+} -result {*command name: *execute script*browser message: *no_var*} -match glob -returnCodes error
+
+test webdriver-alert-5.0 {
+    Test clicking on an element to summon a JavaScript alert and dismiss it.
+} -setup {
+    $driver get [page page_click_alert.html]
+} -constraints {webConnected handlesAlerts} -body {
+    $driver find_element_by_id "a:clickme" -command_var element
+    $element click
+    set text [$driver alert_text]
+    $driver dismiss_alert
+    set text
+} -cleanup {
+    $element destroy
+    unset -nocomplain text
+    $driver get "about:blank"
+} -result {You clicked me!}
+
+test webdriver-finit-99.9 {unload driver} webConnected {
+    $driver quit
+    $driver destroy
+    unset driver
+    testConstraint handlesAlerts 0
+    testConstraint cssSelectorsEnabled 0
+    testConstraint javascriptEnabled 0
+    testConstraint webConnected 0
+} {0}
+
+test webdriver-finit-99.91 {unload driver} seleniumStarted {
+    eval {
+        package require http
+        package require selenium::utils::process
+        ::http::geturl "http://127.0.0.1:$seleniumport/shutdown"
+        ::selenium::utils::port::wait_until_connectable $seleniumport 10
+        ::selenium::utils::process::kill $seleniumpid
+    }
+    testConstraint seleniumStarted 0
+} {0}
+
+cleanupTests

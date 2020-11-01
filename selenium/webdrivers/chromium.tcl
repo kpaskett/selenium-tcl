@@ -4,17 +4,17 @@ package require selenium::chrome
 
 
 namespace eval ::selenium::webdrivers::chromium {
-	namespace export ChromiumDriver
+    namespace export ChromiumDriver
     
-	oo::class create ChromiumDriver {
-		superclass ::selenium::ChromeDriver
-		
-		constructor {args} {
+    oo::class create ChromiumDriver {
+        superclass ::selenium::ChromeDriver
+        
+        constructor {args} {
             array set options $args
             
             if {![info exists options(-browser_binary)]} {
                 if {$::tcl_platform(platform) eq "windows"} {
-                    # buscar chromium en registro de windows
+                    # Look for Chromium in Windows Registry
                     lappend args -browser_binary [exec where chromium-browser.exe]
                 } else {
                     lappend args -browser_binary [exec which chromium-browser]
@@ -27,7 +27,7 @@ namespace eval ::selenium::webdrivers::chromium {
 }
 
 namespace eval ::selenium {
-	namespace import ::selenium::webdrivers::chromium::ChromiumDriver
-	namespace export ChromiumDriver
+    namespace import ::selenium::webdrivers::chromium::ChromiumDriver
+    namespace export ChromiumDriver
 }
 

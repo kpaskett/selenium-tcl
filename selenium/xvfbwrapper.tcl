@@ -23,7 +23,7 @@ namespace eval ::xvfb {
     catch {set TMPDIR $::env(TEMP)}
     
     proc rand_range {min max} {
-        return [expr int(rand()*($max-$min+1)) + $min]
+        return [expr {int(rand()*($max-$min+1)) + $min}]
     }
     
     set XVFB_ERROR {XVFB_ERROR {Error of xvfb module}}
@@ -39,13 +39,13 @@ namespace eval ::xvfb {
             set height $options(-height)
             set colordepth $options(-colordepth)
             
-            if [info exists options(-display)] {
+            if {[info exists options(-display)]} {
                 set display $options(-display)
             } else {
                 set display ""
             }
             
-            if [info exists options(-tempdir)] {
+            if {[info exists options(-tempdir)]} {
                 set tempdir $options(-tempdir)
             } else {
                 set tempdir $::xvfb::TMPDIR
@@ -63,7 +63,7 @@ namespace eval ::xvfb {
                 }
             }
 
-            if [info exists ::env(DISPLAY)] {
+            if {[info exists ::env(DISPLAY)]} {
                 set orig_display [lindex [split $::env(DISPLAY) :] 1]
             } else {
                 set orig_display ""

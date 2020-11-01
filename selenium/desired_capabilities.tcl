@@ -94,6 +94,15 @@ namespace eval ::selenium {
                                         platform ANY
                                         javascriptEnabled true}
 											
+    # STUB for following the W3C standard that selenium 4.0 will use with modern browsers             
+	set DesiredCapabilities(W3C) {
+                                        browserName W3C
+                                        browserVersion ""
+                                        platformName ANY
+                                        acceptInsecureCerts false
+                                        setWindowRect true                                        
+                                        javascriptEnabled true}
+											
 	proc desired_capabilities {browser_name} {
 		variable DesiredCapabilities
 		return $DesiredCapabilities($browser_name)
