@@ -2,11 +2,11 @@
 
 lappend auto_path [file join [pwd] ..]
 
-package require selenium::firefox
-set driver [::selenium::FirefoxDriver new]
+#package require selenium::firefox
+#set driver [::selenium::FirefoxDriver new]
 
-#package require selenium::chrome
-#set driver [::selenium::ChromeDriver new -browser_args --headless]
+package require selenium::chrome
+set driver [::selenium::ChromeDriver new -browser_args --headless]
 
 #package require selenium::chromium
 #set driver [::selenium::ChromiumDriver new]

@@ -1,6 +1,6 @@
 #!/usr/bin/tclsh
 
-package require tcltest 2.5
+package require tcltest
 namespace import ::tcltest::*
 
 configure {*}$argv -singleproc true -testdir [file dirname [info script]]
@@ -21,6 +21,7 @@ foreach {_driver _check} {
     chromeDriver    "exec chromedriver --version"
     geckoDriver     "exec geckodriver --version"
     operaDriver     "exec operadriver --version"
+    ieDriver        "exec iedriverserver --version"
     phantomjsDriver "exec phantomjs --version"
     htmlunitDriver  "exec $java {*}$htmlunitlauncher --version"
     seleniumDriver  "exec $java {*}$seleniumlauncher --version"

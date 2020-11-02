@@ -68,7 +68,7 @@ namespace eval ::selenium {
                                         browserName chrome
                                         version ""
                                         platform ANY
-                                        javascriptEnabled true }
+                                        javascriptEnabled true}
 
 	set DesiredCapabilities(INTERNETEXPLORER) {
                                         browserName "internet explorer"

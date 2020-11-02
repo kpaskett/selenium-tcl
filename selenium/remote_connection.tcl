@@ -2,6 +2,7 @@ package require http 2
 
 package require selenium::utils::url_codification
 package require selenium::utils::json
+package require selenium::utils::log
 
 namespace eval ::selenium {
 
@@ -24,7 +25,11 @@ namespace eval ::selenium {
                 namespace upvar ::selenium HTTP_TEMPLATES_OF_WEBDRIVER_PROTOCOL HTTP_TEMPLATES_OF_WEBDRIVER_PROTOCOL
             }
 
-            namespace import ::selenium::utils::url_codification::url_encode ::selenium::utils::json::compile_to_json ::selenium::utils::json::json_to_tcl
+            namespace import \
+                    ::selenium::utils::url_codification::url_encode \
+                    ::selenium::utils::json::compile_to_json \
+                    ::selenium::utils::json::json_to_tcl \
+                    ::selenium::utils::log::log
 
             if {[string match */ $server_addr]} {
                 set server_addr [string range $server_addr 0 end-1]
@@ -94,7 +99,7 @@ namespace eval ::selenium {
                 lappend http_request -type "application/json;charset=UTF-8" -query $query
             }
 
-#puts stderr [list http_request:\n$http_request]
+            log debug {http_request:\n$http_request}
             try {
                 # send request
                 if {[catch {set token [eval $http_request]} msg]} {
@@ -110,7 +115,7 @@ namespace eval ::selenium {
 				# Restore previous configuration
                 ::http::config {*}$previous_settings
             }
-#puts stderr [list http_response:\n$response]
+            log debug {http_response:\n$response}
 
             return $response
         }

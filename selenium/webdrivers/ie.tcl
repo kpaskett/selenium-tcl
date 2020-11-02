@@ -48,7 +48,7 @@ namespace eval ::selenium::webdrivers::ie {
                     }
                     -host {
                         set host $option_value
-                        lappend parameters_to_driver "--host==$option_value"
+                        lappend parameters_to_driver "--host=$option_value"
                     }
                     -capabilities {
                         set desired_capabilities $option_value
@@ -78,7 +78,6 @@ namespace eval ::selenium::webdrivers::ie {
             }
 
             next [my service_url] $desired_capabilities
-
         }
 
         method service_url {} {
@@ -106,9 +105,7 @@ namespace eval ::selenium::webdrivers::ie {
 
             catch {selenium::utils::process::kill $pid}
         }
-
     }
-
 }
 
 namespace eval ::selenium {

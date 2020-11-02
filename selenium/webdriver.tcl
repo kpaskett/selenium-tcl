@@ -1,7 +1,7 @@
 package require selenium::utils::port
 package require selenium::utils::json
-
 package require selenium::utils::base64
+package require selenium::utils::log
 
 namespace eval ::selenium {
 
@@ -43,7 +43,9 @@ namespace eval ::selenium {
 
             set driver [self]
 
-            namespace import ::selenium::utils::json::compile_to_json \
+            namespace import \
+                    ::selenium::utils::json::compile_to_json \
+                    ::selenium::utils::log::log \
                     ::selenium::webelement::WebElement \
                     ::selenium::container_of_webelements::Container_Of_WebElements
 
@@ -58,7 +60,6 @@ namespace eval ::selenium {
                         JAVASCRIPT_RETURNS_ELEMENTS JAVASCRIPT_RETURNS_ELEMENTS \
                         WEB_ELEMENT_ID WEB_ELEMENT_ID
             }
-#puts stderr [list ::selenium::Remote_Connection new $service_url]
 
             set remote_connection [::selenium::Remote_Connection new $service_url]
 
@@ -118,7 +119,6 @@ namespace eval ::selenium {
                 set json_response [my execute $Command(NEW_SESSION) desiredCapabilities $desired_capabilities requiredCapabilities $required_capabilities]
             }
 
-#puts stderr [list start session json_response $json_response]
             if {[dict exists $json_response sessionId]} {
                 # chromedriver, operadriver, selenium 2 htmlunit
 
@@ -151,7 +151,7 @@ namespace eval ::selenium {
                 set w3c_compliant 1
             }
 
-#puts stderr [list start session w3c_compliant $w3c_compliant]
+            log debug {start session w3c_compliant $w3c_compliant}
         }
 
         method execute {command_name args} {

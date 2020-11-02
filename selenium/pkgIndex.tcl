@@ -3,6 +3,7 @@ package ifneeded lambda 1 [list source [file join $dir utils lambda.tcl]]
 package ifneeded xvfbwrapper 0.1 [list source [file join $dir xvfbwrapper.tcl]]
 package ifneeded browser_info 0.1 [list source [file join $dir browser_info.tcl]]
 
+package ifneeded selenium::utils::log 0.1 [list source [file join $dir utils log.tcl]]
 package ifneeded selenium::utils::process 0.1 [list source [file join $dir utils process.tcl]]
 package ifneeded selenium::utils::json 0.1 [list source [file join $dir utils json.tcl]]
 package ifneeded selenium::utils::walkin 0.1 [list source [file join $dir utils walkin.tcl]]

@@ -7,6 +7,21 @@ namespace import ::tcltest::*
 
 lappend auto_path [file join [pwd] ..]
 package require selenium
+package require selenium::utils::log
+selenium::utils::log::logctl open [file join [info script].log]
+selenium::utils::log::logctl severity debug 1
+
+set java [expr {[info exists env(JAVA_HOME)] ? [file join $env(JAVA_HOME) bin java] : "java"}]
+set selenium [expr {[info exists env(SELENIUM)] ? $env(SELENIUM) : "/usr/local/lib/selenium"}]
+if {![info exists htmlunitlauncher]} {
+set htmlunitlauncher "-cp $selenium/htmlunit-driver-2.44.0-jar-with-dependencies.jar:$selenium/selenium-server-standalone-3.141.59.jar org.openqa.grid.selenium.GridLauncherV3"
+}
+if {![info exists seleniumlauncher]} {
+set seleniumlauncher "-jar $selenium/selenium-server-standalone-3.141.59.jar"
+}
+if {![info exists selenium4launcher]} {
+set selenium4launcher "-jar $selenium/selenium-server-4.0.0-alpha-6.jar standalone"
+}
 
 # works fine
 #testConstraint chromeDriver [expr {![catch {exec chromedriver --version}]}]
@@ -17,24 +32,19 @@ package require selenium
 # opera message: unsupported command-line --enable-blink-features
 #testConstraint operaDriver [expr {![catch {exec operadriver --version}]}]
 
+# dont start for me
+#testConstraint ieDriver [expr {![catch {exec iedriverserver --version}]}]
+
 # works fine, no alerts
 #testConstraint phantomjsDriver [expr {![catch {exec phantomjs --version}]}]
 
-set java [expr {[info exists env(JAVA_HOME)] ? [file join $env(JAVA_HOME) bin java] : "java"}]
-set selenium [expr {[info exists env(SELENIUM)] ? $env(SELENIUM) : "/usr/local/lib/selenium"}]
-set seleniumport ""
-set seleniumpid ""
-
 # works fine
-#set htmlunitlauncher "-cp $selenium/htmlunit-driver-2.44.0-jar-with-dependencies.jar:$selenium/selenium-server-standalone-3.141.59.jar org.openqa.grid.selenium.GridLauncherV3"
 #testConstraint htmlunitDriver [expr {![catch {exec $java {*}$htmlunitlauncher --version}]}]
 
 # works fine
-#set seleniumlauncher "-jar $selenium/selenium-server-standalone-3.141.59.jar"
 #testConstraint seleniumDriver [expr {![catch {exec $java {*}$seleniumlauncher --version}]}]
 
 # works fine
-#set selenium4launcher "-jar $selenium/selenium-server-4.0.0-alpha-6.jar standalone"
 #testConstraint selenium4Driver [expr {![catch {exec $java {*}$selenium4launcher --version}]}]
 
 #testConstraint seleniumBrowsers 1
@@ -67,6 +77,10 @@ test webdriver-init-0.4-phantomjs "Load phantomjs driver" {!webConnected && phan
     set driver [::selenium::PhantomJSdriver new]
     testConstraint webConnected 1
 } {1}
+
+set seleniumbrowsers {}
+set seleniumport ""
+set seleniumpid ""
 
 test webdriver-init-0.5-htmlunit "Load htmlunit driver" {!webConnected && htmlunitDriver} {
     package require selenium::utils::port
@@ -104,13 +118,12 @@ test webdriver-init-0.6.1-selenium4 "Start selenium" {!webConnected && selenium4
     testConstraint seleniumStarted 1
 } {1}
 
-set seleniumbrowsers {}
-test webdriver-init-0.6.1-selenium "Check selenium browsers" {!webConnected && seleniumStarted && seleniumBrowsers} {
+test webdriver-init-0.6.2-selenium "Check selenium browsers" {!webConnected && seleniumStarted && seleniumBrowsers} {
     set seleniumbrowsers {}
     foreach browser [lsort [array names ::selenium::DesiredCapabilities]] {
         if {[catch {::selenium::WebDriver new http://127.0.0.1:$seleniumport/wd/hub $::selenium::DesiredCapabilities($browser)} result]} {
 #           puts "$browser: $result"
-            puts [list $browser: [regexp -inline {browser message: [^\n]*} $result]]
+            puts [list $browser: [regexp -inline {browser message: [^\{\n]*} $result]]
         } else {
             puts [list $browser: [$result name] [$result current_capabilities]]
             lappend seleniumbrowsers $browser
@@ -121,17 +134,23 @@ test webdriver-init-0.6.1-selenium "Check selenium browsers" {!webConnected && s
     unset -nocomplain result browser
     set seleniumbrowsers
 } [lsort [array names ::selenium::DesiredCapabilities]]
-unset seleniumbrowsers
 
-test webdriver-init-0.6.2-selenium "Load selenium driver" {!webConnected && seleniumStarted} {
-    set caps {browserName firefox}
-#   set caps {browserName chrome}
-#   set caps {browserName operablink}
+test webdriver-init-0.6.3-selenium "Load selenium driver" {!webConnected && seleniumStarted} {
+#   set caps {browserName firefox}
+    set caps {browserName chrome}
+#   set caps {browserName operablink}    
+#   set caps {browserName {internet explorer}}
     set driver [::selenium::WebDriver new http://127.0.0.1:$seleniumport/wd/hub $caps]
     unset caps
     testConstraint handlesAlerts 1
     testConstraint cssSelectorsEnabled 1
     testConstraint javascriptEnabled 1
+    testConstraint webConnected 1
+} {1}
+
+test webdriver-init-0.7-iexplore "Load iexplore driver" {!webConnected && ieDriver} {
+    package require selenium::ie
+    set driver [::selenium::IEDriver new]
     testConstraint webConnected 1
 } {1}
 
@@ -151,9 +170,9 @@ test webdriver-element-1.0 "Label text" -setup {
     $driver find_element_by_id "label" -command_var element
     $element get_text
 } -cleanup {
-    $element destroy
+    catch {$element destroy}
+    unset -nocomplain element
     $driver get "about:blank"
-    unset element
 } -result {Label Text}
 
 test webdriver-element-2.0 "Input value" -setup {
@@ -165,7 +184,8 @@ test webdriver-element-2.0 "Input value" -setup {
             [$element tag_name] \
             [$element is_enabled]
 } -cleanup {
-    $element destroy
+    catch {$element destroy}
+    unset -nocomplain element
     $driver get "about:blank"
 } -result {{Input Field} input true}
 
@@ -176,7 +196,8 @@ test webdriver-element-2.1 "Input clear" -setup {
     $element clear_text
     $element get_attribute value
 } -cleanup {
-    $element destroy
+    catch {$element destroy}
+    unset -nocomplain element
     $driver get "about:blank"
 } -result {}
 
@@ -188,7 +209,8 @@ test webdriver-element-2.2 {Input with iso text} -setup {
     $element send_keys "Hello World! ÄÖÜß"
     $element get_attribute value
 } -cleanup {
-    $element destroy
+    catch {$element destroy}
+    unset -nocomplain element
     $driver get "about:blank"
 } -result {Hello World! ÄÖÜß}
 
@@ -209,7 +231,8 @@ test webdriver-element-3.0 "Checkbox select" -setup {
             [$element click] \
             [$element is_selected]
 } -cleanup {
-    $element destroy
+    catch {$element destroy}
+    unset -nocomplain element
     $driver get "about:blank"
 } -result {false {*value {}*} true} -match glob
 
@@ -223,8 +246,10 @@ test webdriver-element-3.1 "Combobox select" -setup {
             [$option click] \
             [$option is_selected]
 } -cleanup {
-    $option destroy
-    $element destroy
+    catch {$option destroy}
+    unset -nocomplain option
+    catch {$element destroy}
+    unset -nocomplain element
     $driver get "about:blank"
 } -result {false {*value {}*} true} -match glob
 
@@ -274,8 +299,8 @@ test webdriver-alert-5.0 {
     $driver dismiss_alert
     set text
 } -cleanup {
-    $element destroy
-    unset -nocomplain text
+    catch {$element destroy}
+    unset -nocomplain element text
     $driver get "about:blank"
 } -result {You clicked me!}
 
@@ -299,5 +324,7 @@ test webdriver-finit-99.91 {unload driver} seleniumStarted {
     }
     testConstraint seleniumStarted 0
 } {0}
+
+unset seleniumbrowsers seleniumport seleniumpid
 
 cleanupTests
