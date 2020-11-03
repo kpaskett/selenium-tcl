@@ -167,6 +167,7 @@ namespace eval ::selenium {
             }
 
             if {[string is integer $xoff] && [string is integer $yoff]} {
+if 0 {
                 set element_rect [my execute $Command(W3C_GET_ELEMENT_RECT) sessionId $session_ID id $element_ID]
                 set element_rect_x [expr {int( [dict get $element_rect value width] )}]
                 set element_rect_y [expr {int( [dict get $element_rect value height] )}]
@@ -184,7 +185,6 @@ namespace eval ::selenium {
                 set ycoord 0
             }
 
-if 0 {
             # selenium error: UnsupportedCommandException: POST /session/.../actions
             # chrome error: invalid argument\n from invalid argument: 'element' is missing
             set action_payload "
@@ -214,8 +214,6 @@ if 0 {
                 } ]
             } $element_ID $duration $xcoord $ycoord]
 } else {            
-            # using absolute viewport coordinates instead of relative
-            #
             # selenium: UnsupportedCommandException: POST /session/.../actions
             # chrome: ok
             set action_payload [format {\
@@ -229,8 +227,7 @@ if 0 {
                         ]\
                     }\
                 ]\
-            } $duration $element_rect_x $element_rect_y]
-
+            } $duration 0 0]
 }        
             my execute $Command(W3C_PERFORM_ACTIONS) sessionId $session_ID actions $action_payload
         }
