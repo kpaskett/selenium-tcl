@@ -6,11 +6,13 @@ namespace eval ::selenium {
         variable Mouse_Button Command session_ID
 
         method w3c_reset_actions {} {
+            # FIXME my execute not defined for this class
 
             my execute $Command(W3C_RELEASE_ACTIONS) sessionId $session_ID
         }
 
         method w3c_click {{element_ID ""}} {
+            # FIXME my scroll_into_view not defined for this class
 
             if {$element_ID ne ""} {
                 my scroll_into_view $element_ID
@@ -145,7 +147,7 @@ namespace eval ::selenium {
                    \"id\": \"mouse1\",
                    \"parameters\": {\"pointerType\": \"mouse\"},
                    \"actions\": \[
-                     {\"type\": \"pointerMove\", \"origin\": "pointer", \"duration\": 150, \"x\": $xoff, \"y\": $yoff}
+                     {\"type\": \"pointerMove\", \"origin\": \"pointer\", \"duration\": 150, \"x\": $xoff, \"y\": $yoff}
                    \]
                  }
                  \]
@@ -157,7 +159,9 @@ namespace eval ::selenium {
 
         method w3c_move_to_element {element_ID {xoff ""} {yoff ""}} {
 
-            variable duration 150
+#           variable duration 150
+            set duration 150
+
             if {$element_ID eq ""} {
                 throw {Missing Element} {Error: Element ID Must Be Supplied}
             }
@@ -167,18 +171,22 @@ namespace eval ::selenium {
                 set element_rect_x [expr {int( [dict get $element_rect value width] )}]
                 set element_rect_y [expr {int( [dict get $element_rect value height] )}]
 
-                set left_offset [expr {$element_rect_x / 2} ]
-                set top_offset [expr {$element_rect_y / 2} ]
+                set left_offset [expr {$element_rect_x / 2}]
+                set top_offset [expr {$element_rect_y / 2}]
 
                 # FIXME strange expr
-                set xcoord [expr -$left_offset + { $element_rect_x | 0} ]
-                set ycoord [expr -$top_offset + { $element_rect_y | 0} ]
+#               set xcoord [expr -$left_offset + { $element_rect_x | 0} ]
+#               set ycoord [expr -$top_offset + { $element_rect_y | 0} ]
+                set xcoord [expr {-$left_offset + ($element_rect_x | 0)}]
+                set ycoord [expr {-$top_offset + ($element_rect_y | 0)}]
             } else {
                 set xcoord 0
                 set ycoord 0
             }
 
-
+if 0 {
+            # selenium error: UnsupportedCommandException: POST /session/.../actions
+            # chrome error: invalid argument\n from invalid argument: 'element' is missing
             set action_payload "
 
                 \[
@@ -193,7 +201,37 @@ namespace eval ::selenium {
                  \]
 
             "
+            # selenium error: UnsupportedCommandException: POST /session/.../actions 
+            # chomee: no error no expected result
+            set action_payload [format { [
+                {
+                    "type": "pointer",
+                    "id": "mouse1",
+                    "parameters": {"pointerType": "mouse"},
+                    "actions": [
+                        {"type": "pointerMove", "origin": {"ELEMENT": "%s"}, "duration": %d, "x": %d, "y": %d}
+                    ]
+                } ]
+            } $element_ID $duration $xcoord $ycoord]
+} else {            
+            # using absolute viewport coordinates instead of relative
+            #
+            # selenium: UnsupportedCommandException: POST /session/.../actions
+            # chrome: ok
+            set action_payload [format {\
+                [\
+                    {\
+                        "type": "pointer",\
+                        "id": "mouse1",\
+                        "parameters": {"pointerType": "mouse"},\
+                        "actions": [\
+                            {"type": "pointerMove", "duration": %d, "x": %d, "y": %d}\
+                        ]\
+                    }\
+                ]\
+            } $duration $element_rect_x $element_rect_y]
 
+}        
             my execute $Command(W3C_PERFORM_ACTIONS) sessionId $session_ID actions $action_payload
         }
 
@@ -227,6 +265,7 @@ namespace eval ::selenium {
                        set genlist [string trimright $genlist " \n\t,"]
                     }
                 }
+
             # Else's for-loop completion so package up to be sent to Perform Actions
             set action_payload "
                             \[

@@ -1,10 +1,9 @@
-package provide selenium::firefox 0.1
-
 package require selenium
 package require selenium::utils::port
 package require selenium::utils::process
-
 package require browser_info
+
+package provide selenium::firefox 0.1
 
 namespace eval ::selenium::webdrivers::firefox {
     namespace export FirefoxDriver
@@ -135,6 +134,7 @@ namespace eval ::selenium::webdrivers::firefox {
             if {$profile_directory ne ""} {
                 # TODO create base64 of zip file of profile directory
                 # and add to capabilities
+                # FIXME zipped_profile not defined
                 dict set desired_capabilities moz:firefoxOptions profile $zipped_profile
             }
 

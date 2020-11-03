@@ -1,6 +1,6 @@
-package provide selenium::firefox::manifest 0.1
-
 package require tdom
+
+package provide selenium::firefox::manifest 0.1
 
 namespace eval ::selenium::webdrivers::firefox {
 
@@ -66,7 +66,6 @@ namespace eval ::selenium::webdrivers::firefox {
             # 'version': u'1.4',                # version of the addon
             # 'name':    u'Rainbow',            # name of the addon
             # 'unpack':  False }                # whether to unpack the addon
-
 
             set addon_details [dict set id "" unpack false name "" version ""]
 
@@ -160,7 +159,6 @@ namespace eval ::selenium::webdrivers::firefox {
             #  name    Rainbow            # name of the addon
             #  unpack  false }            # whether to unpack the addon
 
-
             set addon_details [dict create id "" unpack false name "" version ""]
 
             if {![file exists $addon_path]} {
@@ -221,8 +219,7 @@ namespace eval ::selenium::webdrivers::firefox {
 
             return $addon_details
         }
-
     }
 
-    #puts [[ExtensionManifest new] addon_details webdriver.xpi]
+    log debug {[[ExtensionManifest new] addon_details webdriver.xpi]}
 }

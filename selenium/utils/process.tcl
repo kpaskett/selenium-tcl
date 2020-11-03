@@ -1,5 +1,6 @@
-package provide selenium::utils::process 0.1
 package require selenium::utils::log
+
+package provide selenium::utils::process 0.1
 
 namespace eval ::selenium::utils::process {
     namespace import ::selenium::utils::log::log

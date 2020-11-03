@@ -360,5 +360,4 @@ namespace eval ::selenium::expected_condition {
     }
 }
 
-
 interp alias {} ::selenium::EC {} ::selenium::expected_condition

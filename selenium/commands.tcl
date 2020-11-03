@@ -101,7 +101,7 @@ namespace eval ::selenium {
         LONG_PRESS  "touch long press"
         FLICK  "touch flick"
 
-        # {HTML 5}
+        # "HTML 5"
         EXECUTE_SQL  "execute SQL"
 
         GET_LOCATION  "get location"

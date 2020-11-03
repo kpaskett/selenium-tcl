@@ -1,7 +1,6 @@
-package provide selenium::chromium 0.1
-
 package require selenium::chrome
 
+package provide selenium::chromium 0.1
 
 namespace eval ::selenium::webdrivers::chromium {
     namespace export ChromiumDriver

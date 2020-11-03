@@ -161,10 +161,36 @@ test webdriver-caps-1.0 "Test current capabilities" webConnected {
         catch {testConstraint $c [dict get $caps $c]}
         puts "Test constraint:  $c is [testConstraint $c]"
     }
+#   testConstraint w3c [$driver w3c_compliant]
+    testConstraint w3c 1
     unset c caps
 } {}
 
-test webdriver-element-1.0 "Label text" -setup {
+test webdriver-page-1.1 "Page title and url" -setup {
+    $driver get [page page1.html]
+} -constraints {webConnected} -body {
+    list [$driver title] [file tail [$driver current_url]]
+} -cleanup {
+    $driver get "about:blank"
+} -result {{Page I} page1.html}
+
+test webdriver-page-1.2 {Switch pages} -setup {
+    set l {}
+    $driver get [page page1.html]
+} -constraints {webConnected} -body {
+    lappend l [file tail [$driver current_url]]
+    $driver get [page page2.html]
+    lappend l [file tail [$driver current_url]]
+    $driver back
+    lappend l [file tail [$driver current_url]]
+    $driver forward
+    lappend l [file tail [$driver current_url]]
+} -cleanup {
+    $driver get "about:blank"
+    unset l
+} -result {page1.html page2.html page1.html page2.html}
+
+test webdriver-element-2.0 "Label text" -setup {
     $driver get [page page_text.html]
 } -constraints {webConnected} -body {
     $driver find_element_by_id "label" -command_var element
@@ -175,7 +201,7 @@ test webdriver-element-1.0 "Label text" -setup {
     $driver get "about:blank"
 } -result {Label Text}
 
-test webdriver-element-2.0 "Input value" -setup {
+test webdriver-element-3.0 "Input value" -setup {
     $driver get [page page_text.html]
 } -constraints {webConnected} -body {
     $driver find_element_by_id "input" -command_var element
@@ -189,7 +215,7 @@ test webdriver-element-2.0 "Input value" -setup {
     $driver get "about:blank"
 } -result {{Input Field} input true}
 
-test webdriver-element-2.1 "Input clear" -setup {
+test webdriver-element-3.1 "Input clear" -setup {
     $driver get [page page_text.html]
 } -constraints {webConnected} -body {
     $driver find_element_by_id "input" -command_var element
@@ -201,7 +227,7 @@ test webdriver-element-2.1 "Input clear" -setup {
     $driver get "about:blank"
 } -result {}
 
-test webdriver-element-2.2 {Input with iso text} -setup {
+test webdriver-element-3.2 {Input with iso text} -setup {
     $driver get [page page_text.html]
 } -constraints {webConnected} -body {
     $driver find_element_by_id "input" -command_var element
@@ -214,7 +240,7 @@ test webdriver-element-2.2 {Input with iso text} -setup {
     $driver get "about:blank"
 } -result {Hello World! ÄÖÜß}
 
-test webdriver-element-2.3 {Multiple elements} -setup {
+test webdriver-element-3.3 {Multiple elements} -setup {
     $driver get [page page_text.html]
 } -constraints {webConnected} -body {
     llength [$driver find_elements_by_tag_name "li"]
@@ -222,7 +248,7 @@ test webdriver-element-2.3 {Multiple elements} -setup {
     $driver get "about:blank"
 } -result {3}
 
-test webdriver-element-3.0 "Checkbox select" -setup {
+test webdriver-element-4.0 "Checkbox select" -setup {
     $driver get [page page_select.html]
 } -constraints {webConnected} -body {
     $driver find_element_by_id "id_enable" -command_var element
@@ -236,7 +262,20 @@ test webdriver-element-3.0 "Checkbox select" -setup {
     $driver get "about:blank"
 } -result {false {*value {}*} true} -match glob
 
-test webdriver-element-3.1 "Combobox select" -setup {
+test webdriver-element-4.0.1 "Checkbox select, action chain" -setup {
+    $driver get [page page_select.html]
+} -constraints {webConnected w3c} -body {
+    set i [$driver find_element_by_id "id_enable"]
+    list \
+        [$driver is_selected $i] \
+        [$driver w3c_click $i] \
+        [$driver is_selected $i]
+} -cleanup {
+    $driver get "about:blank"
+    unset -nocomplain i
+} -result {false {*value {}*} true} -match glob
+
+test webdriver-element-4.1 "Combobox select" -setup {
     $driver get [page page_select.html]
 } -constraints {webConnected} -body {
     $driver find_element_by_id "id_select" -command_var element
@@ -253,7 +292,7 @@ test webdriver-element-3.1 "Combobox select" -setup {
     $driver get "about:blank"
 } -result {false {*value {}*} true} -match glob
 
-test webdriver-element-4.0 {Inject script synchronously} -setup {
+test webdriver-element-5.0 {Inject script synchronously} -setup {
     $driver get [page page1.html]
 } -constraints {webConnected javascriptEnabled} -body {
     set script {
@@ -264,7 +303,7 @@ test webdriver-element-4.0 {Inject script synchronously} -setup {
     $driver get "about:blank"
 } -result {12}
 
-test webdriver-element-4.1 {Inject script asynchronously} -setup {
+test webdriver-element-5.1 {Inject script asynchronously} -setup {
     $driver get [page page1.html]
 } -constraints {webConnected javascriptEnabled} -body {
     set script {
@@ -277,7 +316,7 @@ test webdriver-element-4.1 {Inject script asynchronously} -setup {
     $driver get "about:blank"
 } -result {13}
 
-test webdriver-element-4.2 {Error in script} -setup {
+test webdriver-element-5.2 {Error in script} -setup {
     $driver get [page page1.html]
 } -constraints {webConnected javascriptEnabled} -body {
     set script {
@@ -288,7 +327,7 @@ test webdriver-element-4.2 {Error in script} -setup {
     $driver get "about:blank"
 } -result {*command name: *execute script*browser message: *no_var*} -match glob -returnCodes error
 
-test webdriver-alert-5.0 {
+test webdriver-alert-6.0 {
     Test clicking on an element to summon a JavaScript alert and dismiss it.
 } -setup {
     $driver get [page page_click_alert.html]

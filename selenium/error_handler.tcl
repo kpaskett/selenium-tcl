@@ -1,8 +1,9 @@
+# Error codes defined in the WebDriver wire protocol.
+# Keep in sync with org.openqa.selenium.remote.errorCodes and errorcodes.h
 
 namespace eval ::selenium {
 
-# Error codes defined in the WebDriver wire protocol.
-# Keep in sync with org.openqa.selenium.remote.errorCodes and errorcodes.h
+    variable Exception
 
     variable SUCCESS 0
     variable errorCode
@@ -43,8 +44,11 @@ namespace eval ::selenium {
     set errorCode(400) $Exception(MissingCommandParameters)
 
     oo::class create ErrorHandler {
-        variable message stacktrace screen errorCode SUCCESS Exception
+
         # Handles errors returned by the WebDriver server
+
+        variable message stacktrace screen errorCode SUCCESS Exception
+
         constructor {} {
             namespace upvar ::selenium Exception [self]::Exception
 

@@ -11,7 +11,6 @@ namespace eval ::selenium {
     variable RESPONSE_SUCCESS 0
     variable RESPONSE_ERROR 1
 
-
     oo::class create Remote_Connection {
         #  A connection with the Remote WebDriver server.
         #
@@ -38,7 +37,6 @@ namespace eval ::selenium {
             set [self]::server_addr $server_addr
             set [self]::user_agent $user_agent
         }
-
 
         method dispatch {session_ID command_name command_parameters} {
             # Send a command to the remote server.
@@ -184,6 +182,5 @@ namespace eval ::selenium {
                 }
             }
         }
-
     }
 }

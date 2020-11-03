@@ -10,6 +10,7 @@ package provide xvfbwrapper 0.1
 #
 
 namespace eval ::xvfb {
+
     namespace export Xvfb
 
     # Maximum value to use for a display. 32-bit maxint is the highest Xvfb currently supports
@@ -29,6 +30,7 @@ namespace eval ::xvfb {
     set XVFB_ERROR {XVFB_ERROR {Error of xvfb module}}
     
     oo::class create Xvfb {
+
         variable extra_xvfb_args width height display colordepth tempdir Xvfb_PID orig_display lock_display_file
 
         constructor {args} {

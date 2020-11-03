@@ -1,7 +1,6 @@
-package provide selenium::opera 0.1
-
 package require selenium::chrome
 
+package provide selenium::opera 0.1
 
 namespace eval ::selenium::webdrivers::opera {
     namespace export OperaDriver

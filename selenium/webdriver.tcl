@@ -80,6 +80,11 @@ namespace eval ::selenium {
             return $session_ID
         }
 
+        method w3c_compliant {} {
+
+            return $w3c_compliant
+        }
+
         method name {} {
             # Returns the name of the underlying browser for this instance.
             #
@@ -163,7 +168,7 @@ namespace eval ::selenium {
             #
             # :Returns:
             #   The command's JSON response loaded into a dict object.
-#puts stderr [list $remote_connection dispatch $session_ID $command_name $args]
+#           log debug {$remote_connection dispatch $session_ID $command_name $args}
             set response [$remote_connection dispatch $session_ID $command_name $args]
 
             set json_response [$error_handler check_response $session_ID $command_name $args $response]
@@ -345,10 +350,11 @@ namespace eval ::selenium {
                 element {
                     return [compile_to_json dict [dict create ELEMENT $argument_value]]
                 }
-                # Originally workaround for Firefox as it doesnt do implicit scroll on out-of-view elements.
-                #webelementid {
-                #   return [compile_to_json dict [dict create element-6066-11e4-a52e-4f735466cecf $argument_value]]
-                #}
+                webelementid {
+                   # Originally workaround for Firefox as it doesnt do implicit scroll on out-of-view elements.
+                   # return [compile_to_json dict [dict create element-6066-11e4-a52e-4f735466cecf $argument_value]]
+                   throw $Exception(WebdriverException) "Invalid type: $argument_type"
+                }
                 default {
                     throw $Exception(WebdriverException) "Invalid type: $argument_type"
                 }
@@ -1047,8 +1053,8 @@ namespace eval ::selenium {
                     if {!$w3c_compliant} {
                         set parameters [list id [compile_to_json string $frame_reference]]
                     } else {
-                        if [catch {my find_element -name $frame_reference} frame_elem] {
-                            if [catch {my find_element -id $frame_reference} frame_elem] {
+                        if {[catch {my find_element -name $frame_reference} frame_elem]} {
+                            if {[catch {my find_element -id $frame_reference} frame_elem]} {
                                 error "Can not find frame $frame_reference"
                             }
                         }

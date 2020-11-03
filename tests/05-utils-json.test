@@ -1,0 +1,70 @@
+#
+#
+#
+
+package require tcltest
+namespace import ::tcltest::*
+
+lappend auto_path [file join [pwd] ..]
+
+package require selenium::utils::json
+namespace import selenium::utils::json::*
+
+foreach {n descr json tcl} {
+    1 empty  {} {}
+    2 simple {"a":"b"} {a b}
+    3 double {"a":"b","c":"d"} {a b c d}
+} {
+
+    test utils-json-1.$n.0 "json_to_tcl $descr" {
+        json_to_tcl [list $json]
+    } $tcl
+
+    test utils-json-1.$n.1 "compile_to_json $descr" {
+        compile_to_json dict $tcl
+    } [list $json]
+
+    unset n descr json tcl 
+}
+
+foreach {n descr json tcl} {
+    4 array  {"a":["b","c"]} {a {b c}}
+} {
+
+    test utils-json-1.$n.0 "json_to_tcl $descr" {
+        json_to_tcl [list $json]
+    } $tcl
+
+    test utils-json-1.$n.1 "compile_to_json $descr" bug {
+        compile_to_json dict $tcl
+    } [list $json]
+
+    unset n descr json tcl 
+}
+
+test utils-json-2.0 "compile_to_json array" {
+    compile_to_json dict {a b}
+} {{"a":"b"}}
+
+test utils-json-2.1 "compile_to_json array" {
+    compile_to_json list {a b}
+} {["a","b"]}
+
+test utils-json-2.2 "compile_to_json array" {
+    compile_to_json {dict a list} {a {b c}}
+} {{"a":["b","c"]}}
+
+test utils-json-2.3 "compile_to_json array" {
+    compile_to_json {dict c list * string} {a b c {d e}}
+} {{"a":"b","c":["d","e"]}}
+
+test utils-json-2.4 "compile_to_json array" {
+    compile_to_json {dict c dict * string} {a b c {d e}}
+} {{"a":"b","c":{"d":"e"}}}
+
+test utils-json-2.5 "compile_to_json array" {
+    compile_to_json {dict c {dict d list} * string} {a b c {d {e f}}}
+} {{"a":"b","c":{"d":["e","f"]}}}
+
+cleanupTests
+

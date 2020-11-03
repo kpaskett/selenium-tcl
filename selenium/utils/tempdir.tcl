@@ -87,8 +87,8 @@ namespace eval ::selenium::utils::tempdir {
         variable TMP_MAX
         variable tempdir_prefix
 
-		global tcl_platform
-		set platform $tcl_platform(platform)
+        global tcl_platform
+        set platform $tcl_platform(platform)
 
         array set options [list -suffix "" -prefix $tempdir_prefix -dir "" {*}$args]
         #puts $options(-suffix)
@@ -112,17 +112,17 @@ namespace eval ::selenium::utils::tempdir {
 
             if {![file exists $path]} {
 
-				if {![catch {file mkdir $path}]} {
-					if {$platform eq "windows"} {
-						return $path
-					} else {
-						if {![catch {file attributes $path -permissions 0700}]} {
-							return $path
-						} else {
-							catch {file delete -force -- $path}
-						}
-					}
-				}
+                if {![catch {file mkdir $path}]} {
+                    if {$platform eq "windows"} {
+                        return $path
+                    } else {
+                        if {![catch {file attributes $path -permissions 0700}]} {
+                            return $path
+                        } else {
+                            catch {file delete -force -- $path}
+                        }
+                    }
+                }
             }
         }
         error "failed to find an unused temporary directory name"

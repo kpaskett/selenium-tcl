@@ -1,10 +1,13 @@
 namespace eval ::selenium {
 
     oo::class create Mixin_For_Mouse_Interaction {
+
         variable Mouse_Button Command
 
         method double_click {} {
             # Make double-click action.
+
+            # FIXME my execute not defined for this class
 
             my execute $Command(DOUBLE_CLICK)
         }

@@ -153,7 +153,7 @@ oo::class create ::types::JSON_2_typedObj {
         my AssertNext u null
         my AssertNext l null
         my AssertNext l null
-        return [Null]
+        return [Null new]
     }
 
     method ReadComment {} {
@@ -220,7 +220,10 @@ oo::class create ::types::JSON_2_typedObj {
 
         if { [my PeekChar] eq "\]"} {
             my AdvanceCursor
-            return [huddle list]
+            # FIXME huddle package not used
+            #return [huddle list]
+            #return {HUDDLE {L {}}}
+            return [List new]
         }
 
         try {

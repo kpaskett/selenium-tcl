@@ -1,13 +1,11 @@
-package provide selenium::firefox::profile 0.1
-
 package require selenium::firefox::manifest
-
 package require selenium::utils::types
 package require selenium::utils::types::json
-
 package require selenium::utils::walkin
 package require selenium::utils::tempdir
 package require selenium::utils::base64
+
+package provide selenium::firefox::profile 0.1
 
 namespace eval ::selenium::webdrivers::firefox {
     namespace import ::selenium::Exception
@@ -74,6 +72,7 @@ namespace eval ::selenium::webdrivers::firefox {
 
         method get_port {} {
             # Gets the port that WebDriver is working on
+            # FIXME undefined variable port
             return $port
         }
 
@@ -227,6 +226,7 @@ namespace eval ::selenium::webdrivers::firefox {
 
             if {[string match "*.xpi" $addon]} {
                 if {!$unpack && ![dict get $addon_details unpack]} {
+                    # FIXME undefined variable extensions_path
                     file mkdir $extensions_path
                     append path_to_installed_addon .xpi
 

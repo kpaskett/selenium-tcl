@@ -7,10 +7,10 @@
 # Copyright (c) 2015 Miguel Martínez López
 
 
-package provide selenium::utils::types 0.1.0
-
 package require Tcl 8.5
 package require TclOO       ; # For 8.5. Integrated with 8.6
+
+package provide selenium::utils::types 0.1.0
 
 namespace eval ::types {
     namespace export Dict List String Boolean Number Null get_obj set_obj remove_obj

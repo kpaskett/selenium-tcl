@@ -5,6 +5,8 @@ namespace eval ::selenium {
         method scroll_into_view {element} {
             # Scroll element into view
 
+            # FIXME my execute_javascript not defined for this class
+
             my execute_javascript {arguments[0].scrollIntoView(false);} -arguments [list element $element]
         }
 

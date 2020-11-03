@@ -1,12 +1,13 @@
 namespace eval ::selenium::webelement {
+
     namespace export WebElement
 
     oo::class create WebElement {
+
         variable driver element_ID Command Exception
 
         constructor {theDriver elementID} {
             namespace import ::selenium::Select_Element
-
             namespace eval [self] {
                 namespace upvar ::selenium By By Command Command Exception Exception
             }
@@ -32,13 +33,14 @@ namespace eval ::selenium::webelement {
         }
 
         method add_select_mixin {} {
+            # FIXME Initialize_mixin not defined for this class
+
             if {[my is_select_element]} {
                 oo::objdefine [self] mixin ::selenium::Select_Element
                 my Initialize_mixin
             } else {
-                throw $Exception(UnexpectedTagName) "Select only works on <select> elements, not on $tag_name_of_element"
+                throw $Exception(UnexpectedTagName) "Select only works on <select> elements, not on [my tag_name]"
             }
-
         }
 
         method is_displayed {} {

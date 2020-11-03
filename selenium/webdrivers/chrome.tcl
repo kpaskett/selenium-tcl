@@ -1,8 +1,8 @@
-package provide selenium::chrome 0.1
-
 package require selenium
 package require selenium::utils::port
 package require selenium::utils::process
+
+package provide selenium::chrome 0.1
 
 namespace eval ::selenium::webdrivers::chrome {
     namespace export ChromeDriver chromeOptions

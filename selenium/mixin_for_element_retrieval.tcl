@@ -1,6 +1,7 @@
 namespace eval ::selenium {
 
     oo::class create Mixin_For_Element_Retrieval {
+
         variable driver By Command w3c_compliant
 
         method OptionsForElementRetrieval {arguments} {
@@ -93,6 +94,10 @@ namespace eval ::selenium {
             #       - command_var *name_of_command_variable*
             # :Usage:
             #   driver find_element -css ".foo"
+
+            #
+            # FIXME: my execute and Exception not defined for this class
+            #
 
             array set options [my OptionsForElementRetrieval $args]
 

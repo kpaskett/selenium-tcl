@@ -7,6 +7,8 @@ namespace eval ::selenium {
         variable Exception is_multiselect
 
         method Initialize_mixin {} {
+            # FIXME get_attribute multiple not defined for this class
+
             namespace import \
                 ::selenium::utils::selectors::escape_string_in_xpath \
                 ::selenium::utils::selectors::escape_string_in_css
@@ -17,6 +19,8 @@ namespace eval ::selenium {
 
         method options {} {
             # Returns a list of all options belonging to this select tag
+            #
+            # FIXME get_attribute multiple not defined for this class
 
             return [my find_elements -tag_name option]
         }
@@ -50,6 +54,7 @@ namespace eval ::selenium {
         }
 
         method select_option {args} {
+            # FIXME select_option_by_* not defined for this class
 
             foreach {optionName optionValue} $args {
                 switch -exact $optionName {
@@ -67,6 +72,7 @@ namespace eval ::selenium {
         }
 
         method deselect_option {args} {
+            # FIXME deselect_option_by_* not defined for this class
 
             foreach {optionName optionValue} $args {
                 switch -exact $optionName {
@@ -92,8 +98,10 @@ namespace eval ::selenium {
             # :Args:
             # - value - The value to match against
 
+            # FIXME find_elements not defined for this class
+
             set css "option\[value= '[escape_string_in_css $value]'\]"
-            my find_elements container_of_options -css $css
+            set container_of_options [my find_elements -css $css]
 
             if {[$container_of_options length] == 0} {
                 throw $Exception(NoSuchElement) "Cannot locate option with value: $value"
@@ -170,6 +178,7 @@ namespace eval ::selenium {
                 error "You may only deselect options of a multi-select"
             }
 
+            # FIXME undefined select_element
             set container_of_options [my options $select_element]
 
             $container_of_options foreach opt {
@@ -208,6 +217,7 @@ namespace eval ::selenium {
                 error "You may only deselect options of a multi-select"
             }
 
+            # FIXME undefined select_element
             set container_of_options [my options $select_element]
 
             $container_of_options foreach opt {

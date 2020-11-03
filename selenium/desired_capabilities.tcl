@@ -24,7 +24,6 @@ namespace eval ::selenium {
 	#	set driver [::selenium::WebDriver new http:://localhost:$port $capabilities]
 	#
 
-
 	namespace export desired_capabilities
 	
 	variable DesiredCapabilities
