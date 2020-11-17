@@ -149,6 +149,7 @@ namespace eval ::selenium {
 
             set content_is_an_image no
             foreach content_type [split $state(type) ;] {
+                # FIXME maybe reversed parameters, [string first "image/png" $content_type] ?
                 if {[string first $content_type "image/png"] == 0} {
                     set content_is_an_image yes
                     break
@@ -165,6 +166,7 @@ namespace eval ::selenium {
                     } else {
                         set status $::selenium::RESPONSE_ERROR
                     }
+
                     return [list $status [string trim $data]]
                 } else {
 

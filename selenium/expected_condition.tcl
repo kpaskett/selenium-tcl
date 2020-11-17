@@ -32,7 +32,7 @@ namespace eval ::selenium::expected_condition {
 
         return [lambda {text_in_title driver} {
 
-            if {[string first [$driver title] $text_in_title] != -1} {
+            if {[string first $text_in_title [$driver title]] != -1} {
                 return true
             } else {
                 return false
@@ -114,7 +114,7 @@ namespace eval ::selenium::expected_condition {
                 set element [$driver find_element $by $value]
                 set element_text [$driver get_visible_text $element]
 
-                if {[string first $element_text $text] != -1} {
+                if {[string first $text $element_text] != -1} {
                     return true
                 } else {
                     return false
@@ -136,7 +136,7 @@ namespace eval ::selenium::expected_condition {
                 set element_text [$element get_attribute value]
 
                 if {$element_text ne ""} {
-                    if {[string first $element_text $text] != -1} {
+                    if {[string first $text $element_text] != -1} {
                         return true
                     } else {
                         return false

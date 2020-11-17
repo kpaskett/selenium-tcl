@@ -356,10 +356,19 @@ test webdriver-wait-6.0.1 {wait for element with text not exists} -setup {
     $driver get [page page_click_alert.html]
 } -constraints {webConnected} -body {
     selenium::wait_until -driver $driver -timeout 1 \
-        -condition [::selenium::expected_condition text_to_be_present_in_element -css "div" "Do not Click!"]
+        -condition [::selenium::expected_condition text_to_be_present_in_element -css "div" "Do not Click Me!"]
 } -cleanup {
     $driver get "about:blank"
 } -result {Timeout while executing wait_until procedure.} -returnCodes 1
+
+test webdriver-wait-6.0.0 {wait for element with partial text} -setup {
+    $driver get [page page_click_alert.html]
+} -constraints {webConnected} -body {
+    selenium::wait_until -driver $driver -timeout 1 \
+        -condition [::selenium::expected_condition text_to_be_present_in_element -css "div" "Me!"]
+} -cleanup {
+    $driver get "about:blank"
+} -result {}
 
 test webdriver-wait-6.1.0 {wait for selected state} -setup {
     $driver get [page page_select.html]
