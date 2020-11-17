@@ -2,7 +2,7 @@ namespace eval ::selenium {
 
     oo::class create Mixin_For_Element_Retrieval {
 
-        variable driver By Command w3c_compliant
+        variable driver By Command Exception w3c_compliant WEB_ELEMENT_ID
 
         method OptionsForElementRetrieval {arguments} {
 
@@ -109,8 +109,8 @@ namespace eval ::selenium {
 
             if {[dict exists $response value ELEMENT]} {
                 set element_ID [dict get $response value ELEMENT]
-            } elseif {[dict exists $response value element-6066-11e4-a52e-4f735466cecf]} {
-                set element_ID [dict get $response value element-6066-11e4-a52e-4f735466cecf]
+            } elseif {[dict exists $response value $WEB_ELEMENT_ID]} {
+                set element_ID [dict get $response value $WEB_ELEMENT_ID]
             } else {
                 throw $Exception(WebdriverException) "No element ID found:\n$response"
             }
@@ -145,8 +145,8 @@ namespace eval ::selenium {
             foreach element [dict get $response value] {
                 if {[dict exists $element ELEMENT]} {
                     lappend list_of_element_IDs [dict get $element ELEMENT]
-                } elseif {[dict exists $element element-6066-11e4-a52e-4f735466cecf]} {
-                    lappend list_of_element_IDs [dict get $element element-6066-11e4-a52e-4f735466cecf]
+                } elseif {[dict exists $element $WEB_ELEMENT_ID]} {
+                    lappend list_of_element_IDs [dict get $element $WEB_ELEMENT_ID]
                 } else {
                     throw $Exception(WebdriverException) "No element ID found:\n$element"
                 }

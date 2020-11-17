@@ -3,7 +3,7 @@ namespace eval ::selenium {
     oo::class create Mixin_Action_Chains {
 
         # Making already set variables from higher scope available here
-        variable Mouse_Button Command session_ID
+        variable Mouse_Button Command session_ID WEB_ELEMENT_ID
 
         method w3c_reset_actions {} {
             # FIXME my execute not defined for this class
@@ -166,8 +166,8 @@ namespace eval ::selenium {
                 throw {Missing Element} {Error: Element ID Must Be Supplied}
             }
 
-            if {[string is integer $xoff] && [string is integer $yoff]} {
 if 0 {
+            if {[string is integer $xoff] && [string is integer $yoff]} {
                 set element_rect [my execute $Command(W3C_GET_ELEMENT_RECT) sessionId $session_ID id $element_ID]
                 set element_rect_x [expr {int( [dict get $element_rect value width] )}]
                 set element_rect_y [expr {int( [dict get $element_rect value height] )}]
@@ -209,10 +209,10 @@ if 0 {
                     "id": "mouse1",
                     "parameters": {"pointerType": "mouse"},
                     "actions": [
-                        {"type": "pointerMove", "origin": {"ELEMENT": "%s"}, "duration": %d, "x": %d, "y": %d}
+                        {"type": "pointerMove", "origin": {"ELEMENT": "%s", "%s": "%s"}, "duration": %d, "x": %d, "y": %d}
                     ]
                 } ]
-            } $element_ID $duration $xcoord $ycoord]
+            } $element_ID $WEB_ELEMENT_ID $element_ID $duration $xcoord $ycoord]
 } else {            
             # selenium: UnsupportedCommandException: POST /session/.../actions
             # chrome: ok

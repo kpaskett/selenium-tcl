@@ -327,7 +327,59 @@ test webdriver-element-5.2 {Error in script} -setup {
     $driver get "about:blank"
 } -result {*command name: *execute script*browser message: *no_var*} -match glob -returnCodes error
 
-test webdriver-alert-6.0 {
+test webdriver-element-5.3 {Find element by name} -setup {
+    $driver get [page page_click_alert.html]
+} -constraints {webConnected handlesAlerts} -body {
+    llength [$driver find_element_by_name "clickme"]
+} -cleanup {
+    $driver get "about:blank"
+} -result {1}
+
+test webdriver-element-5.4 {Find element by css selector} -setup {
+    $driver get [page page_click_alert.html]
+} -constraints {webConnected handlesAlerts unsupported} -body {
+    llength [$driver find_element_by_css_selector "div:contains('Click Me!')"]
+} -cleanup {
+    $driver get "about:blank"
+} -result {1}
+
+test webdriver-wait-6.0.0 {wait for element with text} -setup {
+    $driver get [page page_click_alert.html]
+} -constraints {webConnected} -body {
+    selenium::wait_until -driver $driver -timeout 1 \
+        -condition [::selenium::expected_condition text_to_be_present_in_element -css "div" "Click Me!"]
+} -cleanup {
+    $driver get "about:blank"
+} -result {}
+
+test webdriver-wait-6.0.1 {wait for element with text not exists} -setup {
+    $driver get [page page_click_alert.html]
+} -constraints {webConnected} -body {
+    selenium::wait_until -driver $driver -timeout 1 \
+        -condition [::selenium::expected_condition text_to_be_present_in_element -css "div" "Do not Click!"]
+} -cleanup {
+    $driver get "about:blank"
+} -result {Timeout while executing wait_until procedure.} -returnCodes 1
+
+test webdriver-wait-6.1.0 {wait for selected state} -setup {
+    $driver get [page page_select.html]
+} -constraints {webConnected} -body {
+    selenium::wait_until -driver $driver -timeout 1 \
+        -condition [::selenium::expected_condition element_located_selection_state_to_be -id "id_enable" false]
+} -cleanup {
+    $driver get "about:blank"
+} -result {}
+
+test webdriver-wait-6.1.1 {wait for selected state not exists} -setup {
+    $driver get [page page_select.html]
+} -constraints {webConnected} -body {
+    selenium::wait_until -driver $driver -timeout 1 \
+        -condition [::selenium::expected_condition element_located_selection_state_to_be -id "id_enable" true]
+} -cleanup {
+    $driver get "about:blank"
+} -result {Timeout while executing wait_until procedure.} -returnCodes 1
+
+test webdriver-alert-7.0 {
     Test clicking on an element to summon a JavaScript alert and dismiss it.
 } -setup {
     $driver get [page page_click_alert.html]

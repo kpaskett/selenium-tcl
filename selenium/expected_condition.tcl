@@ -16,6 +16,7 @@ namespace eval ::selenium::expected_condition {
         # returns 1 if the title matches, 0 otherwise.
 
         return [lambda {title driver} {
+
             if {$title eq [$driver title]} {
                 return true
             } else {
@@ -30,6 +31,7 @@ namespace eval ::selenium::expected_condition {
         # returns 1 when the title matches, 0 otherwise
 
         return [lambda {text_in_title driver} {
+
             if {[string first [$driver title] $text_in_title] != -1} {
                 return true
             } else {
@@ -43,6 +45,7 @@ namespace eval ::selenium::expected_condition {
         # of a page. This does not necessarily mean that the element is visible.
 
         return [lambda {by value element driver} {
+
             try {
                 if {$element eq ""} {
                     $driver find_element $by $value
@@ -88,7 +91,9 @@ namespace eval ::selenium::expected_condition {
         # element is the WebElement
 
         return [lambda {element driver} {
+
             try {
+
                 if [$driver is_displayed $element] {
                     return true
                 } else {
@@ -104,6 +109,7 @@ namespace eval ::selenium::expected_condition {
         # An expectation for checking if the given text is present in the specified element by locator.
 
         return [lambda {by value text driver} {
+
             try {
                 set element [$driver find_element $by $value]
                 set element_text [$driver get_visible_text $element]
@@ -123,14 +129,14 @@ namespace eval ::selenium::expected_condition {
         # An expectation for checking if the given text is present in the element's
         # locator, text
 
-        # FIXME @@ symbols
         return [lambda {by value text driver} {
+
             try {
-                $driver find_element element @by@ {@value@}
+                $driver find_element $by $value -command_var element
                 set element_text [$element get_attribute value]
 
                 if {$element_text ne ""} {
-                    if {[string first $element_text @text@] != -1} {
+                    if {[string first $element_text $text] != -1} {
                         return true
                     } else {
                         return false
@@ -148,12 +154,12 @@ namespace eval ::selenium::expected_condition {
         # An expectation for checking if the given element has an specific attribute name and value
 
         return [lambda {element attribute_name attribute_value driver} {
+
             if {[$driver get_attribute $element $attribute_name] eq $attribute_value} {
                 return true
             } else {
                 return false
             }
-
         } $element $attribute_name $attribute_value]
     }
 
@@ -167,9 +173,11 @@ namespace eval ::selenium::expected_condition {
             -css -
             -xpath {
                 return [lambda {by value driver} {
+
                     try {
                         set element [$driver find_element element $by $value]
                         $driver switch_to_frame -element $element
+
                         return true
                     } trap $::selenium::Exception(NoSuchFrame) {} {
                         return false
@@ -182,8 +190,10 @@ namespace eval ::selenium::expected_condition {
             -index -
             -name {
                 return [lambda {optionName optionValue driver} {
+
                     try {
                         $driver switch_to_frame $optionName $optionValue
+
                         return true
                     } trap $::selenium::Exception(NoSuchFrame) {} {
                         return false
@@ -206,6 +216,7 @@ namespace eval ::selenium::expected_condition {
         # element reference implies that element is no longer visible.
 
         return [lambda {by value driver} {
+
             try {
                 $driver find_element $by $value
 
@@ -222,8 +233,8 @@ namespace eval ::selenium::expected_condition {
         # An Expectation for checking that all elements indicated are invisible
 
         return [lambda {by value driver} {
-            set container_of_elements [$driver find_elements $by $value]
 
+            set container_of_elements [$driver find_elements $by $value]
             set all_elements_are_invisible true
             foreach element $container_of_elements {
                 if {[$driver is_displayed $element]} {
@@ -233,17 +244,17 @@ namespace eval ::selenium::expected_condition {
             }
 
             return $all_elements_are_invisible
-
         } $by $value]
-
     }
 
     proc element_to_be_clickable {by value} {
         # An Expectation for checking an element is visible and enabled such that you can click it.
 
         return [lambda {by value driver} {
+
             try {
                 set element [$driver find_element $by $value]
+
                 if {[$driver is_displayed $element] && [$driver is_enabled $element]} {
                     return true
                 } else {
@@ -263,6 +274,7 @@ namespace eval ::selenium::expected_condition {
         # Calling any method forces a staleness check
 
         return [lambda {element driver} {
+
             try {
                 # Calling any method forces a staleness check
                 $driver is_enabled $element
@@ -279,7 +291,8 @@ namespace eval ::selenium::expected_condition {
         # element is WebElement object
 
         return [lambda {element driver} {
-            if [$driver is_selected @element@] {
+
+            if [$driver is_selected $element] {
                 return true
             } else {
                 return false
@@ -291,6 +304,7 @@ namespace eval ::selenium::expected_condition {
         #An expectation for the element to be located is selected.
 
         return [lambda {by value driver} {
+
             set element [$driver find_element element $by $value]
 
             if [$driver is_selected $element] {
@@ -309,13 +323,13 @@ namespace eval ::selenium::expected_condition {
         set is_selected [expr {!!$is_selected}]
 
         return [lambda {element is_selected driver} {
+
             if {[$driver is_selected $element] == $is_selected} {
                 return true
             } else {
                 return false
             }
         } $element $is_selected]
-
     }
 
     proc element_located_selection_state_to_be {by value is_selected} {
@@ -327,21 +341,20 @@ namespace eval ::selenium::expected_condition {
 
         set is_selected [expr {!!$is_selected}]
 
-        # FIXME undefined $element and @xxx@
-        return [lambda {element is_selected driver} {
+        return [lambda {by value is_selected driver} {
+
             try {
+                $driver find_element $by $value -command_var element 
 
-                $driver find_element element @by@ {@value@}
-
-                if { !![$element is_selected] == @is_selected@} {
+                if { !![$element is_selected] == $is_selected} {
                     return true
                 } else {
                     return false
                 }
-            } except $::selenium::Exception(StaleElementReference) {} {
+            } trap $::selenium::Exception(StaleElementReference) {} {
                 return false
             }
-        } $element $is_selected]
+        } $by $value $is_selected]
     }
 
 
@@ -349,6 +362,7 @@ namespace eval ::selenium::expected_condition {
         # Expect an alert to be present.
 
         return [lambda driver {
+
             try {
                 $driver text_of_alert
 

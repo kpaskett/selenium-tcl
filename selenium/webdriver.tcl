@@ -1058,11 +1058,11 @@ namespace eval ::selenium {
                                 error "Can not find frame $frame_reference"
                             }
                         }
-                        set parameters [list id [compile_to_json dict [dict create ELEMENT $frame_elem element-6066-11e4-a52e-4f735466cecf $frame_elem]]]
+                        set parameters [list id [compile_to_json dict [dict create ELEMENT $frame_elem $WEB_ELEMENT_ID $frame_elem]]]
                     }
                 }
                 -element {
-                    set parameters [list id [compile_to_json dict [dict create ELEMENT $frame_reference element-6066-11e4-a52e-4f735466cecf $frame_reference]]]
+                    set parameters [list id [compile_to_json dict [dict create ELEMENT $frame_reference $WEB_ELEMENT_ID $frame_reference]]]
                 }
                 default {
                     error "Invalid switch type reference for switch_to_frame: $type"
@@ -1183,6 +1183,5 @@ namespace eval ::selenium {
                 $error_handler destroy
             }
         }
-
     }
 }
