@@ -130,6 +130,15 @@ namespace eval ::selenium {
                 set exception_message [dict get $exception_info localizedMessage]
             } elseif {[dict exist $exception_info message]} {
                 set exception_message [dict get $exception_info message]
+                if {[string match {{*errorMessage*}} $exception_message]} {
+                    # phantomjsDriver
+                    package require selenium::utils::json
+                    set d [::selenium::utils::json::json_to_tcl $exception_message]
+                    if {[dict exists $d errorMessage]} {
+                        set exception_message [dict get $d errorMessage]
+                    }
+                    unset d
+                }
             } else {
                 set exception_message [lrange [lindex $exception_code 2] 0 end]
             }

@@ -21,10 +21,11 @@ namespace eval ::test {
     set javaExecutable [expr {[info exists env(JAVA_HOME)] ? [file join $env(JAVA_HOME) bin java] : "java"}]
     set seleniumPath [expr {[info exists env(SELENIUM)] ? $env(SELENIUM) : "/usr/local/lib/selenium"}]
     if {![info exists htmlunitLauncher]} {
-        # nix
-        set htmlunitLauncher "-cp $seleniumPath/htmlunit-driver-2.44.0-jar-with-dependencies.jar:$seleniumPath/selenium-server-standalone-3.141.59.jar org.openqa.grid.selenium.GridLauncherV3"
-        # win
-        set htmlunitLauncher "-cp $seleniumPath/htmlunit-driver-2.44.0-jar-with-dependencies.jar\\;$seleniumPath/selenium-server-standalone-3.141.59.jar org.openqa.grid.selenium.GridLauncherV3"
+        if {$tcl_platform(platform) eq "windows"} {
+            set htmlunitLauncher "-cp $seleniumPath/htmlunit-driver-2.44.0-jar-with-dependencies.jar\\;$seleniumPath/selenium-server-standalone-3.141.59.jar org.openqa.grid.selenium.GridLauncherV3"
+        } else {
+            set htmlunitLauncher "-cp $seleniumPath/htmlunit-driver-2.44.0-jar-with-dependencies.jar:$seleniumPath/selenium-server-standalone-3.141.59.jar org.openqa.grid.selenium.GridLauncherV3"
+        }        
     }
     if {![info exists seleniumLauncher]} {
         set seleniumLauncher "-jar $seleniumPath/selenium-server-standalone-3.141.59.jar"

@@ -144,7 +144,7 @@ test element-5.2 {Error in script} -setup {
     $driver execute_javascript $script
 } -cleanup {
     $driver get "about:blank"
-} -result {*no_var* is not defined*} -match glob -returnCodes error
+} -result {*no_var*} -match glob -returnCodes error
 
 test element-5.3 {Find element by name} -setup {
     $driver get [page page_click_alert.html]

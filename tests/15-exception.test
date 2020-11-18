@@ -9,17 +9,17 @@ test exception-init-0.1 "load driver" !webConnected {
     testConstraint webConnected 1
 } {1}
 
-test exception-7.0.0 {no such element} -constraints webConnected -body {
+test exception-7.0 {no such element} -constraints webConnected -body {
     try {
-        $driver find_element_by_name "nosuchelement"
+        $driver find_element_by_name "no_element"
     } trap {} v {
         return $v
     }
-} -result {*Unable to locate element*nosuchelement*} -match glob
+} -result {*Unable*element*no_element*} -match glob
 
-test exception-7.0 {no such element} -constraints webConnected -body {
+test exception-7.1 {no such element} -constraints webConnected -body {
     try {
-        $driver find_element_by_name "nosuchelement"
+        $driver find_element_by_name "no_element"
     } trap {SELENIUM} {} {
         return "SELENIUM"
     } trap {} v {
@@ -27,9 +27,9 @@ test exception-7.0 {no such element} -constraints webConnected -body {
     }
 } -result {SELENIUM}
 
-test exception-7.1 {no such element} -constraints webConnected -body {
+test exception-7.3 {no such element} -constraints webConnected -body {
     try {
-        $driver find_element_by_name "nosuchelement"
+        $driver find_element_by_name "no_element"
     } trap {SELENIUM NoSuchElement} {} {
         return "NoSuchElement"
     } trap {} v {
@@ -37,9 +37,9 @@ test exception-7.1 {no such element} -constraints webConnected -body {
     }
 } -result {NoSuchElement}
 
-test exception-7.2 {no such element} -constraints webConnected -body {
+test exception-7.4 {no such element} -constraints webConnected -body {
     try {
-        $driver find_element_by_name "nosuchelement"
+        $driver find_element_by_name "no_element"
     } trap $::selenium::Exception(NoSuchElement) {} {
         return NoSuchElement
     } trap {} v {
@@ -47,9 +47,9 @@ test exception-7.2 {no such element} -constraints webConnected -body {
     }
 } -result {NoSuchElement}
 
-test exception-7.3 {no such element} -constraints webConnected -body {
-    list [catch {$driver find_element_by_name "nosuchelement"} v] $v
-} -result {1 *Unable to locate element*nosuchelement*} -match glob
+test exception-7.5 {no such element} -constraints webConnected -body {
+    list [catch {$driver find_element_by_name "no_element"} v] $v
+} -result {1 *Unable*element*no_element*} -match glob
 
 test exception-finit-99.9 {unload driver} webConnected {
     webDisconnect $driver
