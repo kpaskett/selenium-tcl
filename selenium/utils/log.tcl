@@ -11,6 +11,7 @@ namespace eval ::selenium::utils::log {
     variable severities
     array set severities {
         fatal 1
+        error 1
         warning 1
         notice 1
         debug 0
@@ -83,7 +84,7 @@ namespace eval ::selenium::utils::log {
                 }
             }
             if {$severity in {"bug" "error" "fatal"}} {
-               lappend l "\n CALL STACK:\n[uplevel stack]"
+               lappend l "\nCALL STACK:[uplevel [namespace current]::stack]"
             }
             if {[catch {puts [logctl handle] [join $l " "]} result]} {
                 error "log: write error $result"
@@ -95,8 +96,7 @@ namespace eval ::selenium::utils::log {
     proc stack {} {
         set retval {}
         for {set i 1} {$i < [info level]} {incr i} {
-#           append retval "#$i [uplevel \#$i namespace current] [lindex [info level $i] 0]\n"
-            append retval "#$i [uplevel \#$i namespace current] [string range [info level $i] 0 80]\n"
+            append retval "\n#$i [uplevel \#$i namespace current] [string range [info level $i] 0 80]"
         }
         return $retval
     }

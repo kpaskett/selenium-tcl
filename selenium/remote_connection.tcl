@@ -97,7 +97,7 @@ namespace eval ::selenium {
                 lappend http_request -type "application/json;charset=UTF-8" -query $query
             }
 
-            log debug {http_request:\n$http_request}
+            log debug {http_request: $http_request}
             try {
                 # send request
                 if {[catch {set token [eval $http_request]} msg]} {
@@ -113,7 +113,7 @@ namespace eval ::selenium {
 				# Restore previous configuration
                 ::http::config {*}$previous_settings
             }
-            log debug {http_response:\n$response}
+            log debug {http_response: $response}
 
             return $response
         }

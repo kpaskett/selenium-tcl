@@ -247,8 +247,6 @@ namespace eval ::selenium {
             Indicates that a command that should have executed properly cannot be supported for some reason.
             }
         }
-        
-        
     }
 
     proc Exception {exceptionName} {

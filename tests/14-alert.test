@@ -1,0 +1,32 @@
+#
+#
+#
+
+proc page html {return file://[file join [testsDirectory] html $html]}
+
+test alert-init-0.1-chrome "load driver" !webConnected {
+    set driver [webConnect]
+    testConstraint webConnected 1
+} {1}
+
+test alert-7.0 {
+    Test clicking on an element to summon a JavaScript alert and dismiss it.
+} -setup {
+    $driver get [page page_click_alert.html]
+} -constraints {webConnected handlesAlerts} -body {
+    $driver find_element_by_id "a:clickme" -command_var element
+    $element click
+    set text [$driver alert_text]
+    $driver dismiss_alert
+    set text
+} -cleanup {
+    catch {$element destroy}
+    unset -nocomplain element text
+    $driver get "about:blank"
+} -result {You clicked me!}
+
+test alert-finit-99.9 {unload driver} webConnected {
+    webDisconnect $driver
+    testConstraint webConnected 0
+} {0}
+

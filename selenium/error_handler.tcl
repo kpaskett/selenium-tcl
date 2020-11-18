@@ -1,6 +1,8 @@
 # Error codes defined in the WebDriver wire protocol.
 # Keep in sync with org.openqa.selenium.remote.errorCodes and errorcodes.h
 
+package require selenium::utils::log
+
 namespace eval ::selenium {
 
     variable Exception
@@ -91,7 +93,6 @@ namespace eval ::selenium {
                 } else {
                     set exception_code $Exception(WebdriverException)
                 }
-
                 if {[dict exists $json_answer value]} {
                     set exception_info [dict get $json_answer value]
                 } else {
@@ -102,7 +103,6 @@ namespace eval ::selenium {
                 foreach word [split [dict get $json_answer error] " "] {
                     append exception_name [string totitle $word]
                 }
-
                 if {[info exists Exception($exception_name)]} {
                     set exception_code $Exception($exception_name)
                 } else {
@@ -115,7 +115,6 @@ namespace eval ::selenium {
                 foreach word [split [dict get $exception_info error] " "] {
                     append exception_name [string totitle $word]
                 }
-
                 if {[info exists Exception($exception_name)]} {
                     set exception_code $Exception($exception_name)
                 } else {
@@ -126,7 +125,21 @@ namespace eval ::selenium {
                 set exception_info ""
             }
 
-            set error_message "\n\nWebdriver exception\n-------------------"
+            # set 'exception_message' (short error message) from 'exception_info'
+            if {[dict exist $exception_info localizedMessage]} {
+                set exception_message [dict get $exception_info localizedMessage]
+            } elseif {[dict exist $exception_info message]} {
+                set exception_message [dict get $exception_info message]
+            } else {
+                set exception_message [lrange [lindex $exception_code 2] 0 end]
+            }
+            set exception_eol [string first \n $exception_message]
+            if {$exception_eol > 0} {
+                set exception_message [string range $exception_message 0 $exception_eol-1]
+            }
+
+            # set 'error_message' (long error message) 'exception_info'
+            set error_message "\nWebdriver exception\n-------------------"
             append error_message "\ncommand name: $command_name"
 
             if {$command_parameters ne ""} {
@@ -136,7 +149,6 @@ namespace eval ::selenium {
             if {$session_ID ne ""} {
                 append error_message "\nsession ID: $session_ID"
             }
-
 
             if { $exception_code eq $Exception(UnexpectedAlertOpen) &&  [dict exists $exception_info alert]} {
                 append error_message "\nalert: [dict get $exception_info alert]"
@@ -181,23 +193,25 @@ namespace eval ::selenium {
                 }
 
             }
+
             if {[llength $stacktrace] != 0} {
 
-                append error_message "\nstacktrace:\n"
+                append error_message "\nstacktrace:"
                 foreach stacktrace_frame $stacktrace {
-                    append error_message "    at [dict get $stacktrace_frame info]\n"
+                    append error_message "\n    at [dict get $stacktrace_frame info]"
                     dict for {key value} [dict get $stacktrace_frame frame] {
-                        append error_message "        $key: $value\n"
+                        append error_message "\n        $key: $value"
                     }
-
-                    append error_message "\n"
                 }
             }
 
-            append error_message "\n-------------------\n\n"
+            append error_message "\n-------------------"
 
-            throw $exception_code $error_message
+            # write short and long error message to the log
+            selenium::utils::log::log error {$exception_message} {$error_message}
+
+            # finally
+            throw $exception_code $exception_message
         }
     }
-
 }

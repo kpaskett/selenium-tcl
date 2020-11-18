@@ -1,0 +1,41 @@
+#
+#
+#
+
+proc page html {return file://[file join [testsDirectory] html $html]}
+
+test page-init-0.1-chrome "load driver" {
+    set driver [webConnect]
+    testConstraint webConnected 1
+} {1}
+
+test page-1.1 "Page title and url" -setup {
+    $driver get [page page1.html]
+} -constraints {webConnected} -body {
+    list [$driver title] [file tail [$driver current_url]]
+} -cleanup {
+    $driver get "about:blank"
+} -result {{Page I} page1.html}
+
+test page-1.2 {Switch pages} -setup {
+    set l {}
+    $driver get [page page1.html]
+} -constraints {webConnected} -body {
+    lappend l [file tail [$driver current_url]]
+    $driver get [page page2.html]
+    lappend l [file tail [$driver current_url]]
+    $driver back
+    lappend l [file tail [$driver current_url]]
+    $driver forward
+    lappend l [file tail [$driver current_url]]
+} -cleanup {
+    $driver get "about:blank"
+    unset l
+} -result {page1.html page2.html page1.html page2.html}
+
+test page-finit-99.9 {unload driver} webConnected {
+    webDisconnect $driver
+    testConstraint webConnected 0
+} {0}
+
+cleanupTests

@@ -1,0 +1,59 @@
+#
+#
+#
+
+proc page html {return file://[file join [testsDirectory] html $html]}
+
+test exception-init-0.1 "load driver" !webConnected {
+    set driver [webConnect]
+    testConstraint webConnected 1
+} {1}
+
+test exception-7.0.0 {no such element} -constraints webConnected -body {
+    try {
+        $driver find_element_by_name "nosuchelement"
+    } trap {} v {
+        return $v
+    }
+} -result {*Unable to locate element*nosuchelement*} -match glob
+
+test exception-7.0 {no such element} -constraints webConnected -body {
+    try {
+        $driver find_element_by_name "nosuchelement"
+    } trap {SELENIUM} {} {
+        return "SELENIUM"
+    } trap {} v {
+        return $v
+    }
+} -result {SELENIUM}
+
+test exception-7.1 {no such element} -constraints webConnected -body {
+    try {
+        $driver find_element_by_name "nosuchelement"
+    } trap {SELENIUM NoSuchElement} {} {
+        return "NoSuchElement"
+    } trap {} v {
+        return $v
+    }
+} -result {NoSuchElement}
+
+test exception-7.2 {no such element} -constraints webConnected -body {
+    try {
+        $driver find_element_by_name "nosuchelement"
+    } trap $::selenium::Exception(NoSuchElement) {} {
+        return NoSuchElement
+    } trap {} v {
+        return $v
+    }
+} -result {NoSuchElement}
+
+test exception-7.3 {no such element} -constraints webConnected -body {
+    list [catch {$driver find_element_by_name "nosuchelement"} v] $v
+} -result {1 *Unable to locate element*nosuchelement*} -match glob
+
+test exception-finit-99.9 {unload driver} webConnected {
+    webDisconnect $driver
+    testConstraint webConnected 0
+} {0}
+
+cleanupTests

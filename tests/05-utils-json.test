@@ -2,11 +2,6 @@
 #
 #
 
-package require tcltest
-namespace import ::tcltest::*
-
-lappend auto_path [file join [pwd] ..]
-
 package require selenium::utils::json
 namespace import selenium::utils::json::*
 

@@ -75,14 +75,14 @@ namespace eval ::selenium {
         forward wait_until_connectable ::selenium::utils::port::wait_until_connectable
         forward wait_until_not_connectable ::selenium::utils::port::wait_until_not_connectable
 
-        method session_ID {} {
-
-            return $session_ID
-        }
-
         method w3c_compliant {} {
 
             return $w3c_compliant
+        }
+
+        method session_ID {} {
+
+            return $session_ID
         }
 
         method name {} {

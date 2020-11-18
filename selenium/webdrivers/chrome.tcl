@@ -197,7 +197,6 @@ namespace eval ::selenium::webdrivers::chrome {
 
             if {![info exists desired_capabilities]} {
                 set desired_capabilities [::selenium::desired_capabilities CHROME]
-
             }
 
             if {[llength chrome_options] != 0} {
@@ -210,7 +209,6 @@ namespace eval ::selenium::webdrivers::chrome {
             }
 
             next [my service_url] $desired_capabilities
-
         }
 
         method service_url {} {

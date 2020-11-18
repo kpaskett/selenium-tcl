@@ -6,13 +6,11 @@ namespace eval selenium::utils::json {
         while {[llength $spec]} {
             set type [lindex $spec 0]
             set spec [lrange $spec 1 end]
-#           puts [list $type $spec $data]
             switch -- $type {
                 dict {
                     if {![llength $spec]} {
                         lappend spec * string
                     }
-
                     set json {}
                     foreach {key value} $data {
                         foreach {matching_key subspec} $spec {
