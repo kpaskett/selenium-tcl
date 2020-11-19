@@ -1,5 +1,5 @@
 # selenium-tcl
-[https://sourceforge.net/projects/selenium-tcl/]()
+https://sourceforge.net/projects/selenium-tcl/
 
 Selenium 2.3.2.1
 
