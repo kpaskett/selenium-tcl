@@ -34,6 +34,9 @@ foreach drivername [array names ::test::webDriverChecks] {
         testConstraint $drivername 1
         source 10-driver.test
         testConstraint $drivername 0
+	webConnect $drivername
+	runAllTests
+	webDisconnect
         puts "*** Test for $drivername end"
         puts ""
     }

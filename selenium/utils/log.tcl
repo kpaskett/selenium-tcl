@@ -89,6 +89,9 @@ namespace eval ::selenium::utils::log {
             if {[catch {puts [logctl handle] [join $l " "]} result]} {
                 error "log: write error $result"
             }
+            if {$severity in {"bug" "error" "fatal"} && [catch {flush [logctl handle]} result]} {
+                error "log: flush error $result"
+            }
         }
         return ""
     }
@@ -96,7 +99,7 @@ namespace eval ::selenium::utils::log {
     proc stack {} {
         set retval {}
         for {set i 1} {$i < [info level]} {incr i} {
-            append retval "\n#$i [uplevel \#$i namespace current] [string range [info level $i] 0 80]"
+            append retval "\n#$i [uplevel \#$i namespace current] [string range [regsub -all {\s+} [info level $i] " "] 0 80]"
         }
         return $retval
     }

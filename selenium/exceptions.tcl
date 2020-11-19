@@ -6,7 +6,7 @@ namespace eval ::selenium {
     variable Exception 
 
     array set Exception {
-        WebdriverException { SELENIUM WebdriverException unknown {
+        WebdriverException { SELENIUM WebdriverException {
             Webdriver Exception
             }
         }
