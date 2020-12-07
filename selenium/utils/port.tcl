@@ -1,6 +1,9 @@
+package require selenium::utils::log
+
 package provide selenium::utils::port 0.1
 
 namespace eval ::selenium::utils::port {
+    namespace import ::selenium::utils::log::log
     namespace export *
     
 	proc is_connectable {port} {
@@ -27,6 +30,7 @@ namespace eval ::selenium::utils::port {
                 return 0
             }
             incr count
+            log debug {wait disconnect $port $count/$max_attemps}
             after 1000
         }
         
@@ -40,6 +44,7 @@ namespace eval ::selenium::utils::port {
                 return 0
             }
             incr count
+            log debug {wait connect $port $count/$max_attemps}
             after 1000
         }
         

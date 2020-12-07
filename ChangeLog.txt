@@ -1,3 +1,9 @@
+Selenium 2.3.2.1
+    - Fork from https://github.com/jianiau/selenium-tcl
+    - Updates from https://github.com/SavSanta/w3cselenium-tcl 
+    - Fixed found bugs, mistypes and formatting.
+    - Basic test suite on ideas from https://github.com/tobijk/caius.
+
 Selenium 2.3.2
     - Fixed bug with selenium version
 

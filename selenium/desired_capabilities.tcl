@@ -24,7 +24,6 @@ namespace eval ::selenium {
 	#	set driver [::selenium::WebDriver new http:://localhost:$port $capabilities]
 	#
 
-
 	namespace export desired_capabilities
 	
 	variable DesiredCapabilities
@@ -68,7 +67,7 @@ namespace eval ::selenium {
                                         browserName chrome
                                         version ""
                                         platform ANY
-                                        javascriptEnabled true }
+                                        javascriptEnabled true}
 
 	set DesiredCapabilities(INTERNETEXPLORER) {
                                         browserName "internet explorer"
@@ -92,6 +91,15 @@ namespace eval ::selenium {
                                         browserName firefox
                                         version ""
                                         platform ANY
+                                        javascriptEnabled true}
+											
+    # STUB for following the W3C standard that selenium 4.0 will use with modern browsers             
+	set DesiredCapabilities(W3C) {
+                                        browserName W3C
+                                        browserVersion ""
+                                        platformName ANY
+                                        acceptInsecureCerts false
+                                        setWindowRect true                                        
                                         javascriptEnabled true}
 											
 	proc desired_capabilities {browser_name} {

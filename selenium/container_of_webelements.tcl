@@ -1,25 +1,25 @@
 namespace eval ::selenium::container_of_webelements {
-	namespace export Container_Of_WebElements
+    namespace export Container_Of_WebElements
     
-	oo::class create Container_Of_WebElements {
-		variable driver list_of_element_IDs set_of_webelements container_length
-		
-		constructor {theDriver listOfElementIds} {
+    oo::class create Container_Of_WebElements {
+        variable driver list_of_element_IDs set_of_webelements container_length
+        
+        constructor {theDriver listOfElementIds} {
             namespace import ::selenium::webelement::WebElement
-			            
-			set driver $theDriver
-			
+                        
+            set driver $theDriver
+            
             set list_of_element_IDs $listOfElementIds
             
             set container_length [llength $listOfElementIds]
             array set set_of_webelements ""
-		}
+        }
         
         method list_of_element_IDs {} {
             return $list_of_element_IDs
         }
-		        
-		method index {i} {
+                
+        method index {i} {
             if {$i >= 0 && $i < [llength $list_of_element_IDs]} {
                 if {[info exists set_of_webelements($i)]} {
                     set webelement $set_of_webelements($i)
@@ -32,11 +32,11 @@ namespace eval ::selenium::container_of_webelements {
             } else {
                 return ""
             }
-		}
-		
-		method length {} {
-			return $container_length
-		}
+        }
+        
+        method length {} {
+            return $container_length
+        }
         
         method foreach {elementVar codeToEval} {
             upvar $elementVar webelement
@@ -49,12 +49,12 @@ namespace eval ::selenium::container_of_webelements {
             
             return -code $return_code $return_message
         }
-			
-		destructor {
-			foreach webelement [dict values $set_of_webelements] {
-				catch "$webelement destroy"
-			}
-		}
-		
-	}
+            
+        destructor {
+            foreach webelement [dict values $set_of_webelements] {
+                catch "$webelement destroy"
+            }
+        }
+        
+    }
 }

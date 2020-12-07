@@ -10,6 +10,7 @@ package provide xvfbwrapper 0.1
 #
 
 namespace eval ::xvfb {
+
     namespace export Xvfb
 
     # Maximum value to use for a display. 32-bit maxint is the highest Xvfb currently supports
@@ -23,12 +24,13 @@ namespace eval ::xvfb {
     catch {set TMPDIR $::env(TEMP)}
     
     proc rand_range {min max} {
-        return [expr int(rand()*($max-$min+1)) + $min]
+        return [expr {int(rand()*($max-$min+1)) + $min}]
     }
     
     set XVFB_ERROR {XVFB_ERROR {Error of xvfb module}}
     
     oo::class create Xvfb {
+
         variable extra_xvfb_args width height display colordepth tempdir Xvfb_PID orig_display lock_display_file
 
         constructor {args} {
@@ -39,13 +41,13 @@ namespace eval ::xvfb {
             set height $options(-height)
             set colordepth $options(-colordepth)
             
-            if [info exists options(-display)] {
+            if {[info exists options(-display)]} {
                 set display $options(-display)
             } else {
                 set display ""
             }
             
-            if [info exists options(-tempdir)] {
+            if {[info exists options(-tempdir)]} {
                 set tempdir $options(-tempdir)
             } else {
                 set tempdir $::xvfb::TMPDIR
@@ -63,7 +65,7 @@ namespace eval ::xvfb {
                 }
             }
 
-            if [info exists ::env(DISPLAY)] {
+            if {[info exists ::env(DISPLAY)]} {
                 set orig_display [lindex [split $::env(DISPLAY) :] 1]
             } else {
                 set orig_display ""

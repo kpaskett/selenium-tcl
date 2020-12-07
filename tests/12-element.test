@@ -1,0 +1,168 @@
+#
+# some tests are stolen from https://github.com/tobijk/caius
+#
+
+proc page html {return file://[file join [testsDirectory] html $html]}
+
+test element-init-0.1 "load driver" !webConnected {
+    set driver [webConnect]
+    testConstraint webConnected 1
+} {1}
+
+test element-2.0 "Label text" -setup {
+    $driver get [page page_text.html]
+} -constraints {webConnected} -body {
+    $driver find_element_by_id "label" -command_var element
+    $element get_text
+} -cleanup {
+    catch {$element destroy}
+    unset -nocomplain element
+    $driver get "about:blank"
+} -result {Label Text}
+
+test element-3.0 "Input value" -setup {
+    $driver get [page page_text.html]
+} -constraints {webConnected} -body {
+    $driver find_element_by_id "input" -command_var element
+    list \
+            [$element get_attribute value] \
+            [$element tag_name] \
+            [$element is_enabled]
+} -cleanup {
+    catch {$element destroy}
+    unset -nocomplain element
+    $driver get "about:blank"
+} -result {{Input Field} input true}
+
+test element-3.1 "Input clear" -setup {
+    $driver get [page page_text.html]
+} -constraints {webConnected} -body {
+    $driver find_element_by_id "input" -command_var element
+    $element clear_text
+    $element get_attribute value
+} -cleanup {
+    catch {$element destroy}
+    unset -nocomplain element
+    $driver get "about:blank"
+} -result {}
+
+test element-3.2 {Input with iso text} -setup {
+    $driver get [page page_text.html]
+} -constraints {webConnected} -body {
+    $driver find_element_by_id "input" -command_var element
+    $element clear_text
+    $element send_keys "Hello World! ÄÖÜß"
+    $element get_attribute value
+} -cleanup {
+    catch {$element destroy}
+    unset -nocomplain element
+    $driver get "about:blank"
+} -result {Hello World! ÄÖÜß}
+
+test element-3.3 {Multiple elements} -setup {
+    $driver get [page page_text.html]
+} -constraints {webConnected} -body {
+    llength [$driver find_elements_by_tag_name "li"]
+} -cleanup {
+    $driver get "about:blank"
+} -result {3}
+
+test element-4.0 "Checkbox select" -setup {
+    $driver get [page page_select.html]
+} -constraints {webConnected} -body {
+    $driver find_element_by_id "id_enable" -command_var element
+    list \
+            [$element is_selected] \
+            [$element click] \
+            [$element is_selected]
+} -cleanup {
+    catch {$element destroy}
+    unset -nocomplain element
+    $driver get "about:blank"
+} -result {false {*value {}*} true} -match glob
+
+test element-4.0.1 "Checkbox select, action chain" -setup {
+    $driver get [page page_select.html]
+} -constraints {webConnected w3c} -body {
+    set i [$driver find_element_by_id "id_enable"]
+    list \
+        [$driver is_selected $i] \
+        [$driver w3c_click $i] \
+        [$driver is_selected $i]
+} -cleanup {
+    $driver get "about:blank"
+    unset -nocomplain i
+} -result {false {*value {}*} true} -match glob
+
+test element-4.1 "Combobox select" -setup {
+    $driver get [page page_select.html]
+} -constraints {webConnected} -body {
+    $driver find_element_by_id "id_select" -command_var element
+    $element find_element -xpath {//option[2]} -command_var option
+    list \
+            [$option is_selected] \
+            [$option click] \
+            [$option is_selected]
+} -cleanup {
+    catch {$option destroy}
+    unset -nocomplain option
+    catch {$element destroy}
+    unset -nocomplain element
+    $driver get "about:blank"
+} -result {false {*value {}*} true} -match glob
+
+test element-5.0 {Inject script synchronously} -setup {
+    $driver get [page page1.html]
+} -constraints {webConnected javascriptEnabled} -body {
+    set script {
+        return Math.sqrt(arguments[0]);
+    }
+    $driver execute_javascript $script -argument number 144
+} -cleanup {
+    $driver get "about:blank"
+} -result {12}
+
+test element-5.1 {Inject script asynchronously} -setup {
+    $driver get [page page1.html]
+} -constraints {webConnected javascriptEnabled} -body {
+    set script {
+        var callback = arguments[arguments.length - 1]
+        var result = Math.sqrt(arguments[0]);
+        callback(result);
+    }
+    $driver execute_javascript $script -async -argument number 169
+} -cleanup {
+    $driver get "about:blank"
+} -result {13}
+
+test element-5.2 {Error in script} -setup {
+    $driver get [page page1.html]
+} -constraints {webConnected javascriptEnabled} -body {
+    set script {
+        return no_var;
+    }
+    $driver execute_javascript $script
+} -cleanup {
+    $driver get "about:blank"
+} -result {*no_var*} -match glob -returnCodes error
+
+test element-5.3 {Find element by name} -setup {
+    $driver get [page page_click_alert.html]
+} -constraints {webConnected handlesAlerts} -body {
+    llength [$driver find_element_by_name "clickme"]
+} -cleanup {
+    $driver get "about:blank"
+} -result {1}
+
+test element-5.4 {Find element by css selector} -setup {
+    $driver get [page page_click_alert.html]
+} -constraints {webConnected handlesAlerts unsupported} -body {
+    llength [$driver find_element_by_css_selector "div:contains('Click Me!')"]
+} -cleanup {
+    $driver get "about:blank"
+} -result {1}
+
+test element-finit-99.9 {unload driver} webConnected {
+    webDisconnect $driver
+    testConstraint webConnected 0
+} {0}

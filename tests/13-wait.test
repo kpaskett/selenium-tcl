@@ -1,0 +1,97 @@
+#
+#
+#
+
+proc page html {return file://[file join [testsDirectory] html $html]}
+
+test wait-init-0.1-chrome "load driver" !webConnected {
+    set driver [webConnect]
+    testConstraint webConnected 1
+} {1}
+
+test wait-6.0.0 {wait for element with text} -setup {
+    $driver get [page page_click_alert.html]
+} -constraints {webConnected} -body {
+    selenium::wait_until -driver $driver -timeout 1 \
+        -condition [::selenium::expected_condition text_to_be_present_in_element -css "div" "Click Me!"]
+} -cleanup {
+    $driver get "about:blank"
+} -result {}
+
+test wait-6.0.1 {wait for element with text not exists} -setup {
+    $driver get [page page_click_alert.html]
+} -constraints {webConnected} -body {
+    selenium::wait_until -driver $driver -timeout 1 \
+        -condition [::selenium::expected_condition text_to_be_present_in_element -css "div" "Do not Click Me!"]
+} -cleanup {
+    $driver get "about:blank"
+} -result {Timeout while executing wait_until procedure.} -returnCodes 1
+
+test wait-6.0.2 {wait for element with partial text} -setup {
+    $driver get [page page_click_alert.html]
+} -constraints {webConnected} -body {
+    selenium::wait_until -driver $driver -timeout 1 \
+        -condition [::selenium::expected_condition text_to_be_present_in_element -css "div" "Me!"]
+} -cleanup {
+    $driver get "about:blank"
+} -result {}
+
+test wait-6.0.3 {wait for element with nonexistent text} -setup {
+    $driver get [page page_click_alert.html]
+} -constraints {webConnected} -body {
+    selenium::wait_until -driver $driver -timeout 1 \
+        -condition [::selenium::expected_condition text_to_be_present_in_element -css "div" "no_text"]
+} -cleanup {
+    $driver get "about:blank"
+} -result {Timeout while executing wait_until procedure.} -returnCodes 1
+
+test wait-6.0.4 {wait for nonexistent element text} -setup {
+    $driver get [page page_click_alert.html]
+} -constraints {webConnected} -body {
+    selenium::wait_until -driver $driver -timeout 1 \
+        -condition [::selenium::expected_condition text_to_be_present_in_element -css "no_element" ""]
+} -cleanup {
+    $driver get "about:blank"
+} -result {*Unable*element*no_element*} -match glob -returnCodes 1
+
+test wait-6.1.0 {wait presence of element} -setup {
+    $driver get [page page_click_alert.html]
+} -constraints {webConnected} -body {
+    selenium::wait_until -driver $driver -timeout 1 \
+        -condition [::selenium::expected_condition presence_of_element_located -css "div"]
+} -cleanup {
+    $driver get "about:blank"
+} -result {}
+
+test wait-6.1.1 {wait presence of missing element} -setup {
+    $driver get [page page_click_alert.html]
+} -constraints {webConnected} -body {
+    selenium::wait_until -driver $driver -timeout 1 \
+        -condition [::selenium::expected_condition presence_of_element_located -css "no_element"]
+} -cleanup {
+    $driver get "about:blank"
+} -result {Timeout while executing wait_until procedure.} -returnCodes 1
+
+test wait-6.2.0 {wait for selected state} -setup {
+    $driver get [page page_select.html]
+} -constraints {webConnected} -body {
+    selenium::wait_until -driver $driver -timeout 1 \
+        -condition [::selenium::expected_condition element_located_selection_state_to_be -id "id_enable" false]
+} -cleanup {
+    $driver get "about:blank"
+} -result {}
+
+test wait-6.2.1 {wait for selected state not exists} -setup {
+    $driver get [page page_select.html]
+} -constraints {webConnected} -body {
+    selenium::wait_until -driver $driver -timeout 1 \
+        -condition [::selenium::expected_condition element_located_selection_state_to_be -id "id_enable" true]
+} -cleanup {
+    $driver get "about:blank"
+} -result {Timeout while executing wait_until procedure.} -returnCodes 1
+
+test wait-finit-99.9 {unload driver} webConnected {
+    webDisconnect $driver
+    testConstraint webConnected 0
+} {0}
+
